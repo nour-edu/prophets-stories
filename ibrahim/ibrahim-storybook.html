@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ibrahim and the Fire ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #07091A;
+  --gold: #FFCA5A;
+  --deep-gold: #C9963A;
+  --orange: #FF7B2E;
+  --fire1: #FF3D00;
+  --fire2: #FF8C00;
+  --fire3: #FFD700;
+  --cream: #FFFDF4;
+  --sand: #F5E4C0;
+  --green: #2ECC71;
+  --teal: #00B894;
+  --ink: #1E150A;
+  --ink-soft: #3D2A10;
+  --nav-h: 96px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Baloo 2', cursive;
+  background: var(--night);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===================== COVER ===================== */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 80%, #3D0C00 0%, #150030 50%, #07091A 100%);
+}
+.starfield { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.star { position:absolute; border-radius:50%; background:white; animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s); }
+@keyframes twinkle { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:1;transform:scale(1.6)} }
+.ember { position:absolute; border-radius:50%; animation:floatUp var(--dur,4s) ease-in infinite var(--delay,0s); pointer-events:none; }
+@keyframes floatUp { 0%{transform:translateY(0) scale(1);opacity:.8} 100%{transform:translateY(-200px) scale(0.2);opacity:0} }
+.cover-fire-wrap { position:relative; width:200px; height:220px; margin-bottom:28px; filter:drop-shadow(0 0 40px rgba(255,120,0,0.5)); }
+.cover-fire-wrap svg { width:100%; height:100%; }
+@keyframes flicker { 0%,100%{transform:scaleX(1) scaleY(1) rotate(0deg)} 20%{transform:scaleX(.97) scaleY(1.04) rotate(-.5deg)} 50%{transform:scaleX(1.03) scaleY(.97) rotate(.5deg)} 80%{transform:scaleX(.98) scaleY(1.02) rotate(-.3deg)} }
+.flame-anim { animation:flicker .7s ease-in-out infinite; transform-origin:bottom center; }
+@keyframes glowPulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:.9;transform:scale(1.08)} }
+.glow-pulse { animation:glowPulse 1.8s ease-in-out infinite; }
+.cover-badge { background:rgba(255,202,90,.12); border:1.5px solid rgba(255,202,90,.35); border-radius:50px; padding:7px 20px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:18px; backdrop-filter:blur(4px); }
+.cover-title { font-family:'Baloo 2',cursive; font-size:clamp(38px,10vw,56px); font-weight:800; color:white; line-height:1.05; margin-bottom:8px; text-shadow:0 0 60px rgba(255,120,0,.6),0 4px 20px rgba(0,0,0,.5); }
+.cover-title em { color:var(--gold); font-style:normal; text-shadow:0 0 30px rgba(255,202,90,.8); }
+.cover-sub { font-family:'Lora',serif; font-style:italic; font-size:17px; color:rgba(255,255,255,.65); margin-bottom:36px; line-height:1.5; }
+.start-btn { background:linear-gradient(135deg,#FF8C00,#FF3D00); color:white; border:none; padding:16px 40px; border-radius:60px; font-family:'Baloo 2',cursive; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 8px 32px rgba(255,80,0,.5); animation:btnPulse 2s ease-in-out infinite; transition:transform .15s; letter-spacing:.5px; }
+.start-btn:hover { transform:scale(1.06); }
+@keyframes btnPulse { 0%,100%{box-shadow:0 8px 32px rgba(255,80,0,.5),0 0 0 0 rgba(255,130,0,.3)} 50%{box-shadow:0 8px 40px rgba(255,80,0,.7),0 0 0 14px rgba(255,130,0,0)} }
+
+/* ===================== PAGES ===================== */
+.pages { display:none; }
+.pages.visible { display:block; }
+
+/* Each page is exactly one viewport tall, split into illustration + text */
+.page {
+  display: none;
+  height: 100vh;                /* exactly the screen — no scrolling */
+  flex-direction: column;
+  animation: pageSlideIn .45s cubic-bezier(.22,1,.36,1);
+  position: relative;
+  overflow: hidden;             /* nothing bleeds out */
+}
+.page.active { display:flex; }
+@keyframes pageSlideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+
+/* Page themes */
+.pg-night { background:radial-gradient(ellipse at 50% 20%,#1A1A5E 0%,#07091A 70%); }
+.pg-sand  { background:linear-gradient(175deg,#F5E4C0 0%,#EDD0A0 60%,#DABE8A 100%); }
+.pg-fire  { background:radial-gradient(ellipse at 50% 70%,#3D0800 0%,#1A0400 60%,#0D0200 100%); }
+.pg-peace { background:linear-gradient(160deg,#E8F8F0 0%,#D0F0E0 50%,#B8E8D0 100%); }
+.pg-end   { background:radial-gradient(ellipse at 50% 40%,#2D1060 0%,#07091A 70%); }
+
+/* Illustration — fixed at 42% of screen height, never grows beyond that */
+.scene-wrap {
+  width: 100%;
+  flex: 0 0 42vh;   /* exactly 42% of viewport height, no shrink/grow */
+  overflow: hidden;
+  position: relative;
+}
+.scene-wrap svg {
+  width: 100%;
+  height: 100%;       /* SVG fills the container exactly */
+  display: block;
+  preserveAspectRatio: xMidYMid slice; /* crop rather than letterbox */
+}
+
+/* TEXT AREA — gets the remaining 58vh minus nav */
+.text-area {
+  flex: 1 1 0;                               /* fills remaining space */
+  min-height: 0;                             /* allows flex child to shrink */
+  padding: 16px 26px;
+  padding-bottom: calc(var(--nav-h) + 14px); /* always clears nav */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;   /* if somehow too much text, clip instead of scroll */
+}
+
+.page-label { font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; opacity:.45; }
+.pg-night .page-label,.pg-fire .page-label,.pg-end .page-label { color:var(--gold); }
+.pg-sand .page-label,.pg-peace .page-label { color:var(--ink-soft); }
+
+.story-text { font-family:'Lora',serif; font-size:clamp(14px,2.6vw,17px); line-height:1.72; }
+.pg-night .story-text,.pg-fire .story-text,.pg-end .story-text { color:rgba(255,255,255,.88); }
+.pg-sand .story-text,.pg-peace .story-text { color:var(--ink-soft); }
+.pg-night .story-text em { color:var(--gold); }
+.pg-fire .story-text em { color:var(--fire3); }
+.pg-sand .story-text em { color:var(--orange); }
+.pg-peace .story-text em { color:var(--teal); }
+.pg-end .story-text em { color:var(--gold); }
+
+.big-text { font-family:'Baloo 2',cursive; font-size:clamp(17px,3.8vw,23px); font-weight:800; line-height:1.28; }
+.pg-night .big-text { color:var(--gold); }
+.pg-fire .big-text { color:var(--fire3); }
+.pg-sand .big-text { color:var(--fire1); }
+.pg-peace .big-text { color:var(--teal); }
+.pg-end .big-text { color:var(--gold); }
+
+.verse-box { background:rgba(255,202,90,.1); border:1.5px solid rgba(255,202,90,.3); border-radius:14px; padding:12px 18px; text-align:center; }
+.arabic-text { font-size:19px; color:var(--gold); font-family:'Lora',serif; line-height:1.75; margin-bottom:6px; }
+.verse-meaning { font-family:'Lora',serif; font-style:italic; font-size:13px; color:rgba(255,255,255,.6); line-height:1.55; }
+
+/* ===================== NAV ===================== */
+.nav {
+  position:fixed; bottom:0; left:0; right:0;
+  height:var(--nav-h);
+  background:rgba(7,9,26,.97);
+  backdrop-filter:blur(14px);
+  border-top:1px solid rgba(255,202,90,.15);
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  gap:8px;
+  z-index:200;
+}
+.nav.visible { display:flex; }
+.nav-btn {
+  flex: 0 0 auto;
+  min-width:80px;
+  background:rgba(255,202,90,.12);
+  border:1.5px solid rgba(255,202,90,.3);
+  color:var(--gold);
+  padding:10px 16px;
+  border-radius:60px;
+  font-family:'Baloo 2',cursive;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:.3px;
+  white-space:nowrap;
+  text-align:center;
+}
+.nav-btn:hover { background:rgba(255,202,90,.22); transform:scale(1.04); }
+.nav-btn:disabled { opacity:.2; cursor:default; transform:none; }
+.progress-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+}
+.dot {
+  flex:0 0 auto;
+  width:6px; height:6px;
+  border-radius:50%;
+  background:rgba(255,202,90,.25);
+  transition:all .3s;
+}
+.dot.active { background:var(--gold); width:16px; border-radius:3px; }
+
+/* ---- AUDIO PLAYER CENTRE ---- */
+.nav-centre {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* ▶ Play / ⏸ Pause button */
+.play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF8C00, #FF3D00);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255,80,0,.45);
+  transition: transform .15s, box-shadow .15s;
+  flex-shrink: 0;
+}
+.play-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255,80,0,.6); }
+.play-btn.playing { background: linear-gradient(135deg, #FF6000, #C94A1D); }
+
+/* Time display */
+.time-display {
+  font-family: 'Baloo 2', cursive;
+  font-size: 10px;
+  color: rgba(255,202,90,.45);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover" id="cover">
+  <div class="starfield" id="starfield"></div>
+  <div id="embers"></div>
+  <div class="cover-fire-wrap">
+    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="195" rx="80" ry="22" fill="#FF6000" opacity=".18" class="glow-pulse"/>
+      <ellipse cx="100" cy="185" rx="55" ry="14" fill="#FF8C00" opacity=".22" class="glow-pulse"/>
+      <g class="flame-anim">
+        <path d="M100,20 Q72,65 55,95 Q38,128 48,162 Q62,185 100,188 Q138,185 152,162 Q162,128 145,95 Q128,65 100,20Z" fill="#FF3D00"/>
+        <path d="M100,45 Q78,82 66,108 Q52,136 62,160 Q76,178 100,181 Q124,178 138,160 Q148,136 134,108 Q122,82 100,45Z" fill="#FF6A00"/>
+        <path d="M100,75 Q84,104 80,122 Q76,142 100,165 Q124,142 120,122 Q116,104 100,75Z" fill="#FFA500"/>
+        <path d="M100,105 Q92,122 94,138 Q100,150 100,154 Q100,150 106,138 Q108,122 100,105Z" fill="#FFD700"/>
+        <path d="M100,118 Q97,128 99,136 Q100,142 100,144 Q100,142 101,136 Q103,128 100,118Z" fill="#FFFDE7"/>
+      </g>
+      <ellipse cx="100" cy="82" rx="9" ry="10" fill="rgba(255,230,160,.95)"/>
+      <path d="M88,91 Q100,87 112,91 L114,120 Q100,126 86,120Z" fill="rgba(255,215,130,.9)"/>
+    </svg>
+  </div>
+  <div class="cover-badge">Prophets of the Heart · Unit 1</div>
+  <div class="cover-title">Ibrahim<br>and the <em>Fire</em></div>
+  <div class="cover-sub">A story about love bigger than any flame</div>
+  <button class="start-btn" onclick="startStory()">Begin the Story ✦</button>
+</div>
+
+<!-- ==================== PAGES ==================== -->
+<div class="pages" id="pages">
+
+<!-- PAGE 1: Night sky -->
+<div class="page pg-night" id="page-1">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sky1" cx="50%" cy="0%" r="100%">
+          <stop offset="0%" stop-color="#1A1A5E"/>
+          <stop offset="100%" stop-color="#07091A"/>
+        </radialGradient>
+        <radialGradient id="moonGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFFDE7"/>
+          <stop offset="100%" stop-color="#FFD54F"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="230" fill="url(#sky1)"/>
+      <!-- Twinkling stars -->
+      <circle cx="40"  cy="25"  r="2"   fill="#FFF9C4" opacity=".9"><animate attributeName="opacity" values=".3;1;.3" dur="2.8s" repeatCount="indefinite"/></circle>
+      <circle cx="80"  cy="15"  r="1.5" fill="white"   opacity=".7"><animate attributeName="opacity" values=".2;.9;.2" dur="3.5s" repeatCount="indefinite" begin=".5s"/></circle>
+      <circle cx="135" cy="30"  r="2.5" fill="#FFF9C4" opacity=".85"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite" begin="1s"/></circle>
+      <circle cx="195" cy="12"  r="1.5" fill="white"   opacity=".9"><animate attributeName="opacity" values=".3;1;.3" dur="4s" repeatCount="indefinite" begin=".2s"/></circle>
+      <circle cx="250" cy="28"  r="2"   fill="#FFF9C4" opacity=".7"><animate attributeName="opacity" values=".2;.8;.2" dur="3.1s" repeatCount="indefinite" begin="1.5s"/></circle>
+      <circle cx="305" cy="18"  r="2.5" fill="white"   opacity=".8"><animate attributeName="opacity" values=".3;1;.3" dur="2.7s" repeatCount="indefinite" begin=".8s"/></circle>
+      <circle cx="355" cy="35"  r="1.5" fill="#FFF9C4" opacity=".6"><animate attributeName="opacity" values=".2;.7;.2" dur="3.8s" repeatCount="indefinite" begin=".3s"/></circle>
+      <circle cx="165" cy="50"  r="1"   fill="white"   opacity=".5"><animate attributeName="opacity" values=".1;.6;.1" dur="4.2s" repeatCount="indefinite" begin="2s"/></circle>
+      <circle cx="55"  cy="65"  r="1"   fill="white"   opacity=".4"><animate attributeName="opacity" values=".15;.55;.15" dur="3.4s" repeatCount="indefinite" begin=".6s"/></circle>
+      <circle cx="340" cy="55"  r="1.5" fill="#FFF9C4" opacity=".6"><animate attributeName="opacity" values=".2;.7;.2" dur="2.9s" repeatCount="indefinite" begin="1.2s"/></circle>
+      <!-- Crescent moon -->
+      <circle cx="312" cy="50" r="26" fill="url(#moonGrad)" opacity=".95"><animate attributeName="opacity" values=".8;1;.8" dur="3s" repeatCount="indefinite"/></circle>
+      <circle cx="324" cy="42" r="22" fill="#07091A"/>
+      <circle cx="324" cy="42" r="22" fill="#1A1A5E" opacity=".4"/>
+      <!-- Desert -->
+      <ellipse cx="200" cy="225" rx="240" ry="50" fill="#1A0E06"/>
+      <ellipse cx="200" cy="218" rx="200" ry="38" fill="#120A04"/>
+      <!-- Seated boy -->
+      <ellipse cx="130" cy="195" rx="14" ry="5" fill="#0A0703"/>
+      <ellipse cx="130" cy="185" rx="9" ry="10" fill="#C9963A" opacity=".85"/>
+      <rect x="122" y="192" width="16" height="10" rx="5" fill="#A07828" opacity=".8"/>
+      <!-- Highlighted star he's looking at -->
+      <circle cx="195" cy="60" r="5" fill="#FFD700" opacity=".8"><animate attributeName="opacity" values=".5;1;.5" dur="1.5s" repeatCount="indefinite"/></circle>
+      <circle cx="195" cy="60" r="9" fill="#FFD700" opacity=".15"><animate attributeName="opacity" values=".1;.25;.1" dur="1.5s" repeatCount="indefinite"/></circle>
+      <line x1="130" y1="183" x2="193" y2="64" stroke="#FFD700" stroke-width=".7" stroke-dasharray="3 4" opacity=".3"/>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 1 · The Big Question</div>
+    <div class="story-text">Long, long ago, in a land of golden sand and a million stars,<br>there lived a boy named <em>Ibrahim</em>.</div>
+    <div class="story-text">Every night he sat alone and looked up at the sky.<br>A question burned inside him, too big to ignore:</div>
+    <div class="big-text">"Who made all of this?"</div>
+  </div>
+</div>
+
+<!-- PAGE 2: Search through stars, moon, sun -->
+<div class="page pg-night" id="page-2">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="dawnGrad" cx="50%" cy="100%" r="80%">
+          <stop offset="0%" stop-color="#FF6020"/>
+          <stop offset="60%" stop-color="#1A1A5E"/>
+          <stop offset="100%" stop-color="#07091A"/>
+        </radialGradient>
+        <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFFDE7"/>
+          <stop offset="60%" stop-color="#FFD54F"/>
+          <stop offset="100%" stop-color="#FF8F00"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="230" fill="url(#dawnGrad)"/>
+      <!-- Fading stars -->
+      <circle cx="50"  cy="30" r="1.5" fill="#FFF9C4" opacity=".4"><animate attributeName="opacity" values=".4;.08;.4" dur="3s" repeatCount="indefinite"/></circle>
+      <circle cx="120" cy="20" r="2"   fill="white"   opacity=".3"><animate attributeName="opacity" values=".3;.05;.3" dur="4s" repeatCount="indefinite"/></circle>
+      <circle cx="220" cy="15" r="1.5" fill="white"   opacity=".25"><animate attributeName="opacity" values=".25;.05;.25" dur="3.5s" repeatCount="indefinite"/></circle>
+      <!-- Rising sun -->
+      <circle cx="200" cy="188" r="55" fill="url(#sunGrad)" opacity=".9"><animate attributeName="cy" values="196;184;196" dur="4s" repeatCount="indefinite"/></circle>
+      <!-- Rays -->
+      <line x1="200" y1="128" x2="200" y2="105" stroke="#FFD700" stroke-width="2.5" opacity=".5" stroke-linecap="round"/>
+      <line x1="242" y1="144" x2="258" y2="128" stroke="#FFD700" stroke-width="2" opacity=".4" stroke-linecap="round"/>
+      <line x1="158" y1="144" x2="142" y2="128" stroke="#FFD700" stroke-width="2" opacity=".4" stroke-linecap="round"/>
+      <line x1="258" y1="178" x2="282" y2="172" stroke="#FFD700" stroke-width="2" opacity=".35" stroke-linecap="round"/>
+      <line x1="142" y1="178" x2="118" y2="172" stroke="#FFD700" stroke-width="2" opacity=".35" stroke-linecap="round"/>
+      <!-- Desert -->
+      <ellipse cx="200" cy="228" rx="240" ry="40" fill="#1A0E06"/>
+      <!-- Boy arms raised, then crossed -->
+      <circle cx="200" cy="175" r="9" fill="#E8956A" opacity=".9"/>
+      <rect x="193" y="183" width="14" height="19" rx="5" fill="#C9963A" opacity=".85"/>
+      <line x1="193" y1="187" x2="174" y2="174" stroke="#C9963A" stroke-width="3.5" stroke-linecap="round" opacity=".8"/>
+      <line x1="207" y1="187" x2="226" y2="174" stroke="#C9963A" stroke-width="3.5" stroke-linecap="round" opacity=".8"/>
+      <!-- X over sun -->
+      <text x="200" y="135" text-anchor="middle" font-size="28" fill="white" opacity=".35" font-family="Baloo 2">✗</text>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 2 · The Search</div>
+    <div class="story-text">He saw the bright stars and thought: <em>"Maybe that is my Lord!"</em><br>But when morning came — the stars faded away.</div>
+    <div class="story-text">He watched the moon sail across the sky.<br>When it vanished, he said: <em>"My Lord does not disappear."</em></div>
+    <div class="big-text">"My Lord is the One who made them all —<br>and is always here."</div>
+  </div>
+</div>
+
+<!-- PAGE 3: The idols -->
+<div class="page pg-sand" id="page-3">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="templeGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#EDD0A0"/>
+          <stop offset="100%" stop-color="#C4A060"/>
+        </linearGradient>
+        <filter id="sh"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-opacity=".25"/></filter>
+      </defs>
+      <rect width="400" height="240" fill="url(#templeGrad)"/>
+      <rect x="0" y="198" width="400" height="42" fill="#B89040" opacity=".5"/>
+      <!-- Columns -->
+      <rect x="18" y="0" width="22" height="240" rx="6" fill="#C4A060" opacity=".55" filter="url(#sh)"/>
+      <rect x="360" y="0" width="22" height="240" rx="6" fill="#C4A060" opacity=".55" filter="url(#sh)"/>
+      <rect x="55" y="10" width="15" height="230" rx="4" fill="#D4B070" opacity=".35"/>
+      <rect x="330" y="10" width="15" height="230" rx="4" fill="#D4B070" opacity=".35"/>
+      <!-- Idol centre — tallest -->
+      <rect x="162" y="40" width="76" height="180" rx="8" fill="#8B6030" filter="url(#sh)"/>
+      <ellipse cx="200" cy="40" rx="38" ry="44" fill="#8B6030"/>
+      <ellipse cx="192" cy="26" rx="6" ry="7" fill="#5A3A10" opacity=".6"/>
+      <ellipse cx="208" cy="26" rx="6" ry="7" fill="#5A3A10" opacity=".6"/>
+      <path d="M190 46 Q200 54 210 46" fill="none" stroke="#5A3A10" stroke-width="2.5" opacity=".5"/>
+      <!-- Idol left -->
+      <rect x="88" y="75" width="54" height="150" rx="6" fill="#A07840" filter="url(#sh)"/>
+      <ellipse cx="115" cy="75" rx="28" ry="33" fill="#A07840"/>
+      <!-- Idol right -->
+      <rect x="258" y="88" width="46" height="136" rx="6" fill="#907030" filter="url(#sh)"/>
+      <ellipse cx="281" cy="88" rx="24" ry="28" fill="#907030"/>
+      <!-- Offerings -->
+      <circle cx="140" cy="210" r="7" fill="#E84C1A" opacity=".8"/>
+      <circle cx="155" cy="212" r="5" fill="#F5A623" opacity=".8"/>
+      <circle cx="262" cy="209" r="6" fill="#FF7B2E" opacity=".7"/>
+      <!-- Ibrahim small, thoughtful -->
+      <circle cx="68" cy="192" r="11" fill="#E8956A"/>
+      <rect x="59" y="202" width="18" height="23" rx="5" fill="#6B8FD8"/>
+      <!-- Thought bubbles -->
+      <circle cx="68" cy="170" r="5" fill="rgba(255,255,255,.4)"/>
+      <circle cx="72" cy="159" r="7" fill="rgba(255,255,255,.35)"/>
+      <circle cx="76" cy="148" r="10" fill="rgba(255,255,255,.3)"/>
+      <text x="76" y="152" text-anchor="middle" font-size="11" fill="#7A3500" opacity=".75" font-family="Lora">?</text>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 3 · The Stone Gods</div>
+    <div class="story-text">Ibrahim's father carved statues from stone — tall, silent, and cold.</div>
+    <div class="story-text">People brought them flowers and bowed before them.<br>But Ibrahim looked into their stone eyes and felt something ache inside.</div>
+    <div class="big-text">"They cannot see you.<br>They cannot hear you.<br>They are only rock."</div>
+  </div>
+</div>
+
+<!-- PAGE 4: The axe -->
+<div class="page pg-sand" id="page-4">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dust4" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#EDD0A0"/>
+          <stop offset="100%" stop-color="#C4A060"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="230" fill="url(#dust4)"/>
+      <!-- Broken idol pieces -->
+      <rect x="50" y="162" width="72" height="19" rx="5" fill="#8B6030" opacity=".82" transform="rotate(-14 86 171)"/>
+      <ellipse cx="63" cy="152" rx="21" ry="25" fill="#8B6030" opacity=".75" transform="rotate(-10 63 152)"/>
+      <rect x="260" y="165" width="62" height="17" rx="4" fill="#907030" opacity=".7" transform="rotate(10 291 173)"/>
+      <ellipse cx="312" cy="155" rx="19" ry="23" fill="#907030" opacity=".65" transform="rotate(12 312 155)"/>
+      <!-- Dust -->
+      <circle cx="100" cy="143" r="4" fill="#C4A060" opacity=".5"/>
+      <circle cx="84"  cy="128" r="2.5" fill="#C4A060" opacity=".4"/>
+      <circle cx="282" cy="148" r="3.5" fill="#C4A060" opacity=".45"/>
+      <circle cx="298" cy="132" r="2" fill="#C4A060" opacity=".35"/>
+      <!-- Large standing idol -->
+      <rect x="153" y="30" width="94" height="188" rx="10" fill="#7A5028"/>
+      <ellipse cx="200" cy="30" rx="47" ry="53" fill="#7A5028"/>
+      <ellipse cx="190" cy="14" rx="8" ry="9" fill="#4A2A08" opacity=".6"/>
+      <ellipse cx="210" cy="14" rx="8" ry="9" fill="#4A2A08" opacity=".6"/>
+      <path d="M188 34 Q200 44 212 34" fill="none" stroke="#4A2A08" stroke-width="2.5" opacity=".5"/>
+      <!-- Axe on shoulder -->
+      <rect x="234" y="68" width="54" height="11" rx="4" fill="#3A2010"/>
+      <rect x="278" y="52" width="22" height="30" rx="5" fill="#8B7040"/>
+      <!-- Ibrahim grinning to side -->
+      <circle cx="90" cy="175" r="13" fill="#E8956A"/>
+      <path d="M83 181 Q90 187 97 181" fill="none" stroke="#8B4020" stroke-width="2.5" stroke-linecap="round" opacity=".85"/>
+      <rect x="79" y="187" width="22" height="27" rx="6" fill="#6B8FD8"/>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 4 · The Brave Act</div>
+    <div class="story-text">One day, while everyone was at a festival, Ibrahim walked into the empty temple.</div>
+    <div class="story-text">He smashed the statues — <em>all but the biggest one.</em><br>He hung the axe on the big idol's shoulder and waited.</div>
+    <div class="story-text">When the people returned shouting, "Who did this?!"</div>
+    <div class="big-text">"Ask him. He has the axe."</div>
+  </div>
+</div>
+
+<!-- PAGE 5: The great fire -->
+<div class="page pg-fire" id="page-5">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 265" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="fireGlow5" cx="50%" cy="80%" r="65%">
+          <stop offset="0%" stop-color="#FF6000" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="#1A0400" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="265" fill="#0D0200"/>
+      <ellipse cx="200" cy="228" rx="185" ry="58" fill="url(#fireGlow5)"/>
+      <!-- Crowd left -->
+      <ellipse cx="28"  cy="252" rx="20" ry="7" fill="#0A0100"/>
+      <circle  cx="28"  cy="237" r="11" fill="#0A0100"/>
+      <ellipse cx="64"  cy="256" rx="17" ry="6" fill="#110300"/>
+      <circle  cx="64"  cy="242" r="9" fill="#110300"/>
+      <ellipse cx="98"  cy="258" rx="14" ry="5" fill="#0D0200"/>
+      <circle  cx="98"  cy="246" r="8" fill="#0D0200"/>
+      <!-- Crowd right -->
+      <ellipse cx="372" cy="252" rx="20" ry="7" fill="#0A0100"/>
+      <circle  cx="372" cy="237" r="11" fill="#0A0100"/>
+      <ellipse cx="336" cy="256" rx="17" ry="6" fill="#110300"/>
+      <circle  cx="336" cy="242" r="9" fill="#110300"/>
+      <ellipse cx="302" cy="258" rx="14" ry="5" fill="#0D0200"/>
+      <circle  cx="302" cy="246" r="8" fill="#0D0200"/>
+      <!-- MASSIVE FIRE -->
+      <path d="M200,18 Q158,78 130,118 Q102,160 116,202 Q134,232 200,238 Q266,232 284,202 Q298,160 270,118 Q242,78 200,18Z" fill="#FF3D00">
+        <animateTransform attributeName="transform" type="scale" values="1 1;0.97 1.05;1.03 0.96;0.97 1.04;1 1" dur=".75s" repeatCount="indefinite" additive="sum" transformOrigin="200 238"/>
+      </path>
+      <path d="M200,50 Q166,102 148,134 Q130,168 144,204 Q160,224 200,228 Q240,224 256,204 Q270,168 252,134 Q234,102 200,50Z" fill="#FF6A00"/>
+      <path d="M200,90 Q178,124 174,150 Q170,174 200,202 Q230,174 226,150 Q222,124 200,90Z" fill="#FFA500"/>
+      <path d="M200,124 Q192,148 194,164 Q200,178 200,182 Q200,178 206,164 Q208,148 200,124Z" fill="#FFD700"/>
+      <path d="M200,142 Q197,155 199,164 Q200,170 200,172 Q200,170 201,164 Q203,155 200,142Z" fill="#FFFDE7"/>
+      <!-- Stars overhead -->
+      <circle cx="60"  cy="40" r="2" fill="#FFF9C4" opacity=".7"><animate attributeName="opacity" values=".4;1;.4" dur="2.5s" repeatCount="indefinite"/></circle>
+      <circle cx="340" cy="30" r="2.5" fill="white" opacity=".6"><animate attributeName="opacity" values=".3;.9;.3" dur="3.2s" repeatCount="indefinite"/></circle>
+      <circle cx="200" cy="18" r="2" fill="#FFF9C4" opacity=".8"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 5 · The Great Fire</div>
+    <div class="story-text">The king was furious. He ordered the biggest fire anyone had ever seen.</div>
+    <div class="story-text">The flames leapt so high that birds fled from the heat.<br>Everyone trembled — <em>everyone except Ibrahim.</em></div>
+    <div class="verse-box">
+      <div class="arabic-text">يَا نَارُ كُونِي بَرْدًا وَسَلَامًا عَلَىٰ إِبْرَاهِيمَ</div>
+      <div class="verse-meaning">"O fire — be coolness and safety for Ibrahim."<br>— Allah's words, Quran 21:69</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 6: Jibreel -->
+<div class="page pg-fire" id="page-6">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="angelGlow" cx="70%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#FFF9C4" stop-opacity=".55"/>
+          <stop offset="100%" stop-color="#FFF9C4" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="fireGlow6" cx="35%" cy="85%" r="55%">
+          <stop offset="0%" stop-color="#FF6000" stop-opacity=".45"/>
+          <stop offset="100%" stop-color="#1A0400" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="240" fill="#100300"/>
+      <ellipse cx="140" cy="215" rx="135" ry="52" fill="url(#fireGlow6)"/>
+      <!-- Flames left -->
+      <path d="M80,240 Q60,178 76,148 Q92,178 98,240Z" fill="#FF3D00" opacity=".8"/>
+      <path d="M112,240 Q100,183 110,156 Q120,183 128,240Z" fill="#FF6A00" opacity=".7"/>
+      <path d="M50,240 Q34,192 48,168 Q62,192 70,240Z" fill="#FF3D00" opacity=".5"/>
+      <!-- Angel glow -->
+      <ellipse cx="290" cy="100" rx="92" ry="58" fill="url(#angelGlow)"/>
+      <!-- Wings -->
+      <path d="M260,96 Q228,58 250,43 Q277,54 270,96Z" fill="rgba(255,249,196,.45)"/>
+      <path d="M260,96 Q244,64 260,49 Q278,60 272,96Z" fill="rgba(255,249,196,.62)"/>
+      <path d="M312,96 Q344,58 322,43 Q295,54 302,96Z" fill="rgba(255,249,196,.45)"/>
+      <path d="M312,96 Q328,64 312,49 Q294,60 300,96Z" fill="rgba(255,249,196,.62)"/>
+      <!-- Angel body -->
+      <ellipse cx="286" cy="96" rx="13" ry="15" fill="rgba(255,249,196,.93)"/>
+      <rect x="274" y="110" width="24" height="30" rx="9" fill="rgba(255,240,180,.88)"/>
+      <!-- Ibrahim — serene, arms at sides -->
+      <circle cx="140" cy="148" r="15" fill="rgba(255,230,180,.97)"/>
+      <rect x="128" y="162" width="24" height="34" rx="8" fill="rgba(200,150,60,.92)"/>
+      <line x1="128" y1="172" x2="110" y2="182" stroke="rgba(200,150,60,.8)" stroke-width="5" stroke-linecap="round"/>
+      <line x1="152" y1="172" x2="170" y2="182" stroke="rgba(200,150,60,.8)" stroke-width="5" stroke-linecap="round"/>
+      <!-- Speech bubble -->
+      <rect x="174" y="108" width="172" height="46" rx="14" fill="rgba(255,249,196,.1)" stroke="rgba(255,249,196,.3)" stroke-width="1.5"/>
+      <text x="260" y="129" text-anchor="middle" font-family="Lora,serif" font-style="italic" font-size="13" fill="rgba(255,249,196,.88)">Do you need anything?</text>
+      <text x="260" y="148" text-anchor="middle" font-family="Lora,serif" font-style="italic" font-size="13" fill="rgba(255,249,196,.88)">I am here to help.</text>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 6 · The "No" That Was Love</div>
+    <div class="story-text">Just before Ibrahim was thrown in, the angel Jibreel came down from the sky.</div>
+    <div class="story-text"><em>"Do you need anything? I can help you."</em></div>
+    <div class="story-text">Ibrahim felt something glowing in his chest — not fear, but the most peaceful feeling he had ever known.</div>
+    <div class="big-text">"From <em>you</em>? No.<br>My Lord knows what I need.<br>He is enough for me."</div>
+  </div>
+</div>
+
+<!-- PAGE 7: The garden in the fire -->
+<div class="page pg-peace" id="page-7">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 255" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="peaceCenter" cx="50%" cy="55%" r="55%">
+          <stop offset="0%" stop-color="#B2DFDB" stop-opacity=".8"/>
+          <stop offset="100%" stop-color="#E0F2F1" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="255" fill="#E8F8F0"/>
+      <ellipse cx="200" cy="185" rx="200" ry="90" fill="url(#peaceCenter)"/>
+      <!-- Soft flame hints on sides -->
+      <path d="M30,255 Q14,208 30,182 Q42,208 56,255Z" fill="#FF8C00" opacity=".18"/>
+      <path d="M370,255 Q386,208 370,182 Q358,208 344,255Z" fill="#FF8C00" opacity=".18"/>
+      <!-- Garden ground -->
+      <ellipse cx="200" cy="232" rx="162" ry="33" fill="#81C784" opacity=".7"/>
+      <ellipse cx="200" cy="228" rx="132" ry="25" fill="#A5D6A7" opacity=".62"/>
+      <!-- Swaying grass -->
+      <path d="M100,232 Q112,188 124,232" fill="none" stroke="#4CAF50" stroke-width="3.5" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="-3 112 232;3 112 232;-3 112 232" dur="2.5s" repeatCount="indefinite"/>
+      </path>
+      <path d="M142,232 Q154,184 166,232" fill="none" stroke="#388E3C" stroke-width="3" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="2 154 232;-2 154 232;2 154 232" dur="3s" repeatCount="indefinite"/>
+      </path>
+      <path d="M186,232 Q198,180 210,232" fill="none" stroke="#4CAF50" stroke-width="4" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="-4 198 232;4 198 232;-4 198 232" dur="2.2s" repeatCount="indefinite"/>
+      </path>
+      <path d="M228,232 Q240,186 252,232" fill="none" stroke="#388E3C" stroke-width="3" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="3 240 232;-3 240 232;3 240 232" dur="2.8s" repeatCount="indefinite"/>
+      </path>
+      <path d="M268,232 Q276,192 284,232" fill="none" stroke="#4CAF50" stroke-width="3.5" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="-2 276 232;2 276 232;-2 276 232" dur="3.3s" repeatCount="indefinite"/>
+      </path>
+      <!-- Colourful flowers -->
+      <circle cx="122" cy="190" r="11" fill="#FFD700" opacity=".9"><animate attributeName="r" values="10;12;10" dur="2s" repeatCount="indefinite"/></circle>
+      <circle cx="120" cy="190" r="4.5" fill="#FF8F00"/>
+      <circle cx="164" cy="184" r="9" fill="#FF7043" opacity=".88"><animate attributeName="r" values="8;10;8" dur="2.5s" repeatCount="indefinite"/></circle>
+      <circle cx="200" cy="181" r="11" fill="#AB47BC" opacity=".82"><animate attributeName="r" values="10;12;10" dur="1.9s" repeatCount="indefinite"/></circle>
+      <circle cx="240" cy="185" r="10" fill="#26C6DA" opacity=".85"><animate attributeName="r" values="9;11;9" dur="2.3s" repeatCount="indefinite"/></circle>
+      <circle cx="276" cy="192" r="9" fill="#EC407A" opacity=".82"><animate attributeName="r" values="8;10;8" dur="2.1s" repeatCount="indefinite"/></circle>
+      <!-- Butterfly -->
+      <g>
+        <path d="M0,0 Q-18,-14 -20,-4 Q-16,4 0,0Z" fill="#FFD700" opacity=".68"/>
+        <path d="M0,0 Q18,-14 20,-4 Q16,4 0,0Z" fill="#FF8F00" opacity=".68"/>
+        <path d="M0,0 Q-12,12 -14,5 Q-10,-2 0,0Z" fill="#FFD700" opacity=".5"/>
+        <path d="M0,0 Q12,12 14,5 Q10,-2 0,0Z" fill="#FF8F00" opacity=".5"/>
+        <animateTransform attributeName="transform" type="translate" values="315 155;320 147;315 155;308 152;315 155" dur="3s" repeatCount="indefinite"/>
+      </g>
+      <!-- Ibrahim walking out — serene, glowing -->
+      <circle cx="200" cy="160" r="40" fill="rgba(255,215,0,.1)"/>
+      <circle cx="200" cy="160" r="24" fill="rgba(255,215,0,.09)"/>
+      <circle cx="200" cy="150" r="17" fill="#F4A460"/>
+      <rect x="185" y="166" width="30" height="40" rx="10" fill="#C9963A"/>
+      <line x1="185" y1="177" x2="163" y2="186" stroke="#C9963A" stroke-width="6.5" stroke-linecap="round"/>
+      <line x1="215" y1="177" x2="237" y2="186" stroke="#C9963A" stroke-width="6.5" stroke-linecap="round"/>
+      <!-- Sparkles -->
+      <circle cx="174" cy="135" r="3.5" fill="#FFD700" opacity=".85"><animate attributeName="opacity" values=".3;1;.3" dur="1.4s" repeatCount="indefinite"/></circle>
+      <circle cx="226" cy="140" r="3" fill="#FFD700" opacity=".75"><animate attributeName="opacity" values=".2;.9;.2" dur="1.8s" repeatCount="indefinite" begin=".4s"/></circle>
+      <circle cx="184" cy="125" r="2.5" fill="white" opacity=".65"><animate attributeName="opacity" values=".2;.85;.2" dur="2s" repeatCount="indefinite" begin=".7s"/></circle>
+      <circle cx="216" cy="122" r="3" fill="#FFD700" opacity=".7"><animate attributeName="opacity" values=".3;.95;.3" dur="1.6s" repeatCount="indefinite" begin="1s"/></circle>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 7 · The Garden Inside the Fire</div>
+    <div class="story-text">Allah spoke to the fire:</div>
+    <div class="big-text">"Be cool. Be safe.<br>For Ibrahim."</div>
+    <div class="story-text">The fire <em>listened.</em><br>It burned only his chains — and set him free.</div>
+    <div class="story-text">Ibrahim walked out calm and bright.<br><em>His face glowed. His clothes smelled of flowers, not smoke.</em></div>
+  </div>
+</div>
+
+<!-- PAGE 8: The Khalil teaching -->
+<div class="page pg-night" id="page-8">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FF4500" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#1A1A5E" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="220" fill="#07091A"/>
+      <!-- Stars -->
+      <circle cx="30"  cy="20" r="2"   fill="#FFF9C4" opacity=".9"><animate attributeName="opacity" values=".3;1;.3" dur="2.6s" repeatCount="indefinite"/></circle>
+      <circle cx="80"  cy="12" r="1.5" fill="white"   opacity=".7"><animate attributeName="opacity" values=".2;.8;.2" dur="3.4s" repeatCount="indefinite" begin=".7s"/></circle>
+      <circle cx="150" cy="25" r="2"   fill="#FFF9C4" opacity=".8"><animate attributeName="opacity" values=".4;1;.4" dur="2.1s" repeatCount="indefinite" begin="1s"/></circle>
+      <circle cx="230" cy="10" r="2.5" fill="white"   opacity=".85"><animate attributeName="opacity" values=".3;1;.3" dur="2.9s" repeatCount="indefinite" begin=".2s"/></circle>
+      <circle cx="310" cy="20" r="1.5" fill="#FFF9C4" opacity=".65"><animate attributeName="opacity" values=".25;.8;.25" dur="3.6s" repeatCount="indefinite" begin="1.4s"/></circle>
+      <circle cx="370" cy="35" r="2"   fill="white"   opacity=".7"><animate attributeName="opacity" values=".2;.85;.2" dur="2.4s" repeatCount="indefinite" begin=".5s"/></circle>
+      <ellipse cx="200" cy="130" rx="90" ry="72" fill="url(#heartGlow)"/>
+      <!-- Heart with flame -->
+      <path d="M200,75 Q178,52 162,62 Q146,74 168,100 Q180,116 200,132 Q220,116 232,100 Q254,74 238,62 Q222,52 200,75Z" fill="#C94A1D" opacity=".92">
+        <animateTransform attributeName="transform" type="scale" values="1;1.1;1;1.06;1" dur="1.2s" repeatCount="indefinite" additive="sum" transformOrigin="200 103"/>
+      </path>
+      <path d="M200,90 Q191,104 191,116 Q200,126 200,128 Q200,126 209,116 Q209,104 200,90Z" fill="#FF8C00" opacity=".9"/>
+      <path d="M200,99 Q196,110 198,118 Q200,124 200,125 Q200,124 202,118 Q204,110 200,99Z" fill="#FFD700"/>
+      <!-- Radiating lines -->
+      <line x1="200" y1="52" x2="200" y2="30" stroke="#FFD700" stroke-width="1.5" opacity=".4" stroke-linecap="round"/>
+      <line x1="228" y1="60" x2="244" y2="43" stroke="#FFD700" stroke-width="1.5" opacity=".35" stroke-linecap="round"/>
+      <line x1="172" y1="60" x2="156" y2="43" stroke="#FFD700" stroke-width="1.5" opacity=".35" stroke-linecap="round"/>
+      <line x1="242" y1="100" x2="264" y2="100" stroke="#FFD700" stroke-width="1.5" opacity=".3" stroke-linecap="round"/>
+      <line x1="158" y1="100" x2="136" y2="100" stroke="#FFD700" stroke-width="1.5" opacity=".3" stroke-linecap="round"/>
+      <text x="200" y="175" text-anchor="middle" font-family="Lora,serif" font-size="28" fill="#FFCA5A" opacity=".82">الخليل</text>
+      <text x="200" y="199" text-anchor="middle" font-family="Baloo 2,cursive" font-size="12" fill="rgba(255,255,255,.38)" letter-spacing="3">AL-KHALIL  ·  THE BELOVED</text>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 8 · The Secret of the Khalil</div>
+    <div class="story-text">Do you know why Allah called Ibrahim <em>"Al-Khalil"</em>?</div>
+    <div class="story-text">Khalil doesn't just mean "friend." It means something deeper —<br>like colour soaking all the way through a cloth until you cannot separate them.</div>
+    <div class="big-text">Allah's love soaked all the way through Ibrahim.<br>That is why the fire could not touch him.</div>
+  </div>
+</div>
+
+<!-- PAGE 9: Your fire -->
+<div class="page pg-sand" id="page-9">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sandGrad9" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFF8E1"/>
+          <stop offset="100%" stop-color="#F5E4C0"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="230" fill="url(#sandGrad9)"/>
+      <!-- Soft sunrays -->
+      <circle cx="200" cy="-20" r="80" fill="#FFD700" opacity=".07"/>
+      <line x1="200" y1="0" x2="60"  y2="65"  stroke="#FFD700" stroke-width="1" opacity=".12"/>
+      <line x1="200" y1="0" x2="340" y2="65"  stroke="#FFD700" stroke-width="1" opacity=".12"/>
+      <line x1="200" y1="0" x2="200" y2="75"  stroke="#FFD700" stroke-width="1.5" opacity=".15"/>
+      <line x1="200" y1="0" x2="100" y2="30"  stroke="#FFD700" stroke-width="1" opacity=".1"/>
+      <line x1="200" y1="0" x2="300" y2="30"  stroke="#FFD700" stroke-width="1" opacity=".1"/>
+      <!-- Child figure -->
+      <circle cx="145" cy="120" r="18" fill="#F4A460"/>
+      <ellipse cx="145" cy="106" rx="18" ry="12" fill="#5D3A1A"/>
+      <circle cx="139" cy="118" r="3.5" fill="#2C1810"/>
+      <circle cx="151" cy="118" r="3.5" fill="#2C1810"/>
+      <path d="M139 129 Q145 135 151 129" fill="none" stroke="#8B4020" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="128" y="137" width="34" height="45" rx="10" fill="#5B9BD5"/>
+      <line x1="128" y1="148" x2="103" y2="162" stroke="#5B9BD5" stroke-width="8.5" stroke-linecap="round"/>
+      <line x1="162" y1="148" x2="187" y2="155" stroke="#5B9BD5" stroke-width="8.5" stroke-linecap="round"/>
+      <rect x="130" y="179" width="14" height="32" rx="7" fill="#4A7BBB"/>
+      <rect x="148" y="179" width="14" height="32" rx="7" fill="#4A7BBB"/>
+      <!-- Ground -->
+      <rect x="0" y="208" width="400" height="22" fill="#D4B070" opacity=".4"/>
+      <!-- Small personal flame -->
+      <g transform="translate(272,148)">
+        <path d="M0,-52 Q-16,-20 -22,2 Q-24,22 0,32 Q24,22 22,2 Q16,-20 0,-52Z" fill="#FF3D00" opacity=".88">
+          <animateTransform attributeName="transform" type="scale" values="1 1;.94 1.09;1.03 .94;.96 1.06;1 1" dur=".85s" repeatCount="indefinite" additive="sum" transformOrigin="0 32"/>
+        </path>
+        <path d="M0,-32 Q-10,-8 -12,8 Q-10,20 0,26 Q10,20 12,8 Q10,-8 0,-32Z" fill="#FF8C00"/>
+        <path d="M0,-14 Q-4,2 0,14 Q4,2 0,-14Z" fill="#FFD700"/>
+      </g>
+      <!-- Dashed arrow from child to flame -->
+      <path d="M175 145 Q222 140 258 148" fill="none" stroke="#C9963A" stroke-width="1.8" stroke-dasharray="5 4" opacity=".5"/>
+      <!-- Floating question mark -->
+      <text x="312" y="110" font-size="30" fill="#C9963A" opacity=".62" font-family="Baloo 2">?</text>
+      <text x="292" y="135" font-size="22" fill="#C9963A" opacity=".4" font-family="Baloo 2">?</text>
+      <!-- Heart near child -->
+      <path d="M96,98 Q90,92 86,96 Q82,101 90,108 Q93,112 96,115 Q99,112 102,108 Q110,101 106,96 Q102,92 96,98Z" fill="#E84C1A" opacity=".72">
+        <animate attributeName="opacity" values=".5;.95;.5" dur="1.5s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">Page 9 · What Is Your Fire?</div>
+    <div class="story-text">Ibrahim's fire was enormous. Yours might look smaller — but it is still a fire.</div>
+    <div class="story-text">Maybe it is raising your hand when you're not sure,<br><em>saying sorry</em> when it feels too hard,<br>or being kind when no one else is.</div>
+    <div class="big-text">You have the same heart as Ibrahim.<br>What is <em>your</em> fire?</div>
+  </div>
+</div>
+
+<!-- PAGE 10: The End -->
+<div class="page pg-end" id="page-10">
+  <div class="scene-wrap">
+    <svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="endGlow" cx="50%" cy="50%" r="55%">
+          <stop offset="0%" stop-color="#6C3483" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="#07091A" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="400" height="230" fill="#07091A"/>
+      <ellipse cx="200" cy="120" rx="162" ry="112" fill="url(#endGlow)"/>
+      <!-- Many bright stars -->
+      <circle cx="40"  cy="20" r="2.5" fill="#FFF9C4" opacity=".9"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>
+      <circle cx="85"  cy="10" r="2"   fill="white"   opacity=".8"><animate attributeName="opacity" values=".3;1;.3" dur="2.8s" repeatCount="indefinite" begin=".4s"/></circle>
+      <circle cx="145" cy="22" r="3"   fill="#FFF9C4" opacity=".88"><animate attributeName="opacity" values=".5;1;.5" dur="1.8s" repeatCount="indefinite" begin=".9s"/></circle>
+      <circle cx="220" cy="8"  r="2"   fill="white"   opacity=".9"><animate attributeName="opacity" values=".4;1;.4" dur="3.2s" repeatCount="indefinite" begin=".2s"/></circle>
+      <circle cx="290" cy="18" r="2.5" fill="#FFF9C4" opacity=".75"><animate attributeName="opacity" values=".3;.9;.3" dur="2.4s" repeatCount="indefinite" begin="1.2s"/></circle>
+      <circle cx="360" cy="28" r="2"   fill="white"   opacity=".7"><animate attributeName="opacity" values=".25;.85;.25" dur="3s" repeatCount="indefinite" begin=".6s"/></circle>
+      <circle cx="168" cy="45" r="1.5" fill="#FFF9C4" opacity=".6"><animate attributeName="opacity" values=".2;.7;.2" dur="3.6s" repeatCount="indefinite" begin="1.5s"/></circle>
+      <circle cx="330" cy="50" r="2"   fill="white"   opacity=".55"><animate attributeName="opacity" values=".2;.75;.2" dur="2.6s" repeatCount="indefinite" begin=".8s"/></circle>
+      <!-- Central flame -->
+      <g transform="translate(200,78)">
+        <path d="M0,-68 Q-30,-26 -40,6 Q-46,36 -30,64 Q-14,82 0,86 Q14,82 30,64 Q46,36 40,6 Q30,-26 0,-68Z" fill="#FF3D00">
+          <animateTransform attributeName="transform" type="scale" values="1 1;.95 1.07;1.04 .95;.96 1.05;1 1" dur=".82s" repeatCount="indefinite" additive="sum" transformOrigin="0 86"/>
+        </path>
+        <path d="M0,-44 Q-20,-8 -24,18 Q-28,42 -14,62 Q-6,74 0,77 Q6,74 14,62 Q28,42 24,18 Q20,-8 0,-44Z" fill="#FF8C00"/>
+        <path d="M0,-18 Q-12,12 -12,32 Q0,52 0,57 Q0,52 12,32 Q12,12 0,-18Z" fill="#FFD700"/>
+        <path d="M0,6 Q-5,22 0,36 Q5,22 0,6Z" fill="#FFFDE7"/>
+      </g>
+      <!-- Gold sparkles -->
+      <circle cx="155" cy="62" r="3.5" fill="#FFD700" opacity=".82"><animate attributeName="opacity" values=".3;1;.3" dur="1.3s" repeatCount="indefinite"/></circle>
+      <circle cx="246" cy="68" r="3"   fill="#FFD700" opacity=".72"><animate attributeName="opacity" values=".2;.9;.2" dur="1.7s" repeatCount="indefinite" begin=".5s"/></circle>
+      <circle cx="165" cy="98" r="2.5" fill="#FFD700" opacity=".65"><animate attributeName="opacity" values=".3;.88;.3" dur="2s" repeatCount="indefinite" begin=".9s"/></circle>
+      <circle cx="236" cy="95" r="3"   fill="#FFD700" opacity=".72"><animate attributeName="opacity" values=".25;.92;.25" dur="1.5s" repeatCount="indefinite" begin=".3s"/></circle>
+      <!-- Separator lines -->
+      <line x1="80"  y1="175" x2="320" y2="175" stroke="rgba(255,202,90,.2)" stroke-width="1"/>
+      <line x1="100" y1="179" x2="300" y2="179" stroke="rgba(255,202,90,.1)" stroke-width="1"/>
+      <text x="200" y="202" text-anchor="middle" font-family="Lora,serif" font-size="20" fill="#FFCA5A" opacity=".78">اللَّهُمَّ إِنَّا نَسْأَلُكَ حُبَّكَ</text>
+      <text x="200" y="222" text-anchor="middle" font-family="Baloo 2,cursive" font-size="11" fill="rgba(255,255,255,.3)" letter-spacing="2">O ALLAH, WE ASK YOU FOR YOUR LOVE</text>
+    </svg>
+  </div>
+  <div class="text-area">
+    <div class="page-label">✦ The End</div>
+    <div class="story-text">Ibrahim walked out of the fire<br>as if he had been in a garden.</div>
+    <div class="story-text">He showed us what no fire can burn:</div>
+    <div class="big-text">Love for Allah is the biggest thing there is.<br>Bigger than any flame.</div>
+    <div class="story-text" style="font-size:15px; opacity:.55; margin-top:4px;">May your heart always carry that love. 🌟</div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+
+<!-- ==================== NAV ==================== -->
+<!-- hidden audio element -->
+<audio id="storyAudio" preload="auto"></audio>
+
+
+
+
+<div class="nav" id="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Back</button>
+
+  <div class="nav-centre">
+    <!-- Play/Pause -->
+    <button class="play-btn" id="playBtn" onclick="togglePlay()" title="Play / Pause">
+      ▶
+    </button>
+    <!-- Dots always visible below the play button -->
+    <div class="progress-dots" id="progressDots"></div>
+    <!-- Time display -->
+    <div class="time-display" id="timeDisplay">0:00</div>
+  </div>
+
+  <button class="nav-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+const TOTAL = 10;
+let current = 1;
+
+/*
+  PAGE TIMESTAMPS — seconds from start of audio when each page should appear.
+  These are based on the narration script estimates.
+  After you generate your real audio, adjust these numbers to match your actual recording.
+  How to find the right numbers:
+    1. Load your MP3 into the storybook
+    2. Press play and watch — when the narration clearly moves to page 2, note the time shown
+    3. Update PAGE_TIMES[1] with that number, and so on for each page
+*/
+const PAGE_TIMES = [
+  0,    // page 1  — starts immediately (cover fades, story begins)
+  40,   // page 2  — "Ibrahim looked at the bright stars…"
+  99,   // page 3  — "Ibrahim's father was a very skilled man…"
+  163,  // page 4  — "One day, everyone went to a festival…"
+  215,  // page 5  — "The king was very angry…"
+  275,  // page 6  — "Just before Ibrahim was thrown into the fire…"
+  337,  // page 7  — "And Allah spoke to the fire…"
+  389,  // page 8  — "Do you know what Allah called Ibrahim?"
+  449,  // page 9  — "Ibrahim's fire was very, very big…"
+  508,  // page 10 — "Ibrahim walked out of the fire…"
+];
+
+/* ===================== AUDIO STATE ===================== */
+const audio = document.getElementById('storyAudio');
+let isPlaying = false;
+let autoAdvanceEnabled = true;
+
+/* Set audio source */
+audio.src = 'audio_prophet_ibrahim_v2.mp3';
+
+/* Play / Pause — simple and direct */
+function togglePlay() {
+  if (isPlaying) {
+    audio.pause();
+  } else {
+    audio.play();
+  }
+}
+
+audio.addEventListener('play',  () => { isPlaying = true;  updatePlayBtn(); });
+audio.addEventListener('pause', () => { isPlaying = false; updatePlayBtn(); });
+audio.addEventListener('ended', () => { isPlaying = false; updatePlayBtn(); });
+
+/* Show error if file not found */
+audio.addEventListener('error', () => {
+  const btn = document.getElementById('playBtn');
+  btn.textContent = '✕';
+  btn.title = 'Audio file not found — check the file path';
+  btn.style.background = 'rgba(255,60,60,.5)';
+});
+
+function updatePlayBtn() {
+  const btn = document.getElementById('playBtn');
+  btn.textContent = isPlaying ? '⏸' : '▶';
+  btn.classList.toggle('playing', isPlaying);
+}
+
+/* ===================== TIME → PAGE AUTO-ADVANCE ===================== */
+audio.addEventListener('timeupdate', () => {
+  const t = audio.currentTime;
+
+  /* Update time display */
+  const m = Math.floor(t / 60);
+  const s = Math.floor(t % 60).toString().padStart(2, '0');
+  const td = document.getElementById('timeDisplay');
+  if (td) td.textContent = `${m}:${s}`;
+
+  /* Auto-advance pages */
+  if (!autoAdvanceEnabled) return;
+  let targetPage = 1;
+  for (let i = 0; i < PAGE_TIMES.length; i++) {
+    if (t >= PAGE_TIMES[i]) targetPage = i + 1;
+  }
+  if (targetPage !== current) {
+    current = targetPage;
+    showPage(current);
+  }
+});
+
+/* When child manually taps Next/Back, pause auto-advance for 8 seconds
+   so the page doesn't immediately jump back to where the audio is */
+function changePage(dir) {
+  const next = current + dir;
+  if (next < 1 || next > TOTAL) return;
+  current = next;
+  showPage(current);
+  /* Seek audio to this page's timestamp — keeps everything in sync */
+  audio.currentTime = PAGE_TIMES[current - 1];
+}
+
+/* ===================== STAR FIELD ===================== */
+const sf = document.getElementById('starfield');
+for (let i = 0; i < 100; i++) {
+  const s = document.createElement('div');
+  const sz = Math.random() * 2.8 + 0.5;
+  s.className = 'star';
+  s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+  sf.appendChild(s);
+}
+
+/* ===================== EMBERS ===================== */
+const eb = document.getElementById('embers');
+const emberColors = ['#FF6000','#FF8C00','#FFD700','#FF4500','#FFA500'];
+function makeEmber() {
+  const e = document.createElement('div');
+  const sz = Math.random() * 5 + 2;
+  e.className = 'ember';
+  e.style.cssText = `width:${sz}px;height:${sz}px;background:${emberColors[Math.floor(Math.random()*emberColors.length)]};bottom:${80+Math.random()*200}px;left:${30+Math.random()*40}%;--dur:${3+Math.random()*3}s;--delay:${Math.random()*2}s;`;
+  eb.appendChild(e);
+  setTimeout(() => e.remove(), 7000);
+}
+setInterval(makeEmber, 350);
+
+/* ===================== STORY NAVIGATION ===================== */
+function startStory() {
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('pages').classList.add('visible');
+  document.getElementById('nav').classList.add('visible');
+  buildDots();
+  showPage(1);
+  audio.play();
+}
+
+function buildDots() {
+  const c = document.getElementById('progressDots');
+  c.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.id = 'dot-' + i;
+    c.appendChild(d);
+  }
+}
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + n).classList.add('active');
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i+1 === n));
+  document.getElementById('prevBtn').disabled = (n === 1);
+  const nb = document.getElementById('nextBtn');
+  nb.disabled = (n === TOTAL);
+  nb.textContent = n === TOTAL ? '✓ Done' : 'Next →';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+</script>
+</body>
+</html>
