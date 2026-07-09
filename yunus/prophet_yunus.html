@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prophet Jonah — The Whale & the Light 🐋</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#f9ca24;--warm:#f39c12;--cream:#fef9e7;--sky1:#0a1628;--sky2:#1a3a6e;--sky3:#2e6da4;--ocean1:#0a2540;--ocean2:#0d3b6e;--ocean3:#1a6fa5;--NAV:72px}
+body{font-family:'Nunito',sans-serif;background:var(--sky1);color:#2C2C2A;overflow-x:hidden}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle 3s infinite}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+#cover{position:fixed;inset:0;z-index:100;background:linear-gradient(180deg,#020d1a,#0a1628 40%,#0d3b6e 80%,#0a2540);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.cover-whale{font-size:80px;animation:float 3s ease-in-out infinite;margin-bottom:1rem}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.cover-title{font-family:'Baloo 2',cursive;font-size:clamp(2rem,8vw,3.5rem);font-weight:800;color:var(--gold);margin-bottom:.5rem}
+.cover-sub{font-size:clamp(1rem,4vw,1.4rem);color:var(--cream);margin-bottom:.5rem;opacity:.9}
+.cover-verse{font-size:.95rem;color:rgba(255,255,255,.6);font-style:italic;margin-bottom:2.5rem;max-width:360px;line-height:1.6}
+.start-btn{background:linear-gradient(135deg,var(--gold),var(--warm));border:none;border-radius:50px;padding:16px 48px;font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:700;color:#2C2C2A;cursor:pointer;box-shadow:0 6px 30px rgba(249,202,36,.4);transition:transform .2s}
+.start-btn:hover{transform:scale(1.05)}
+#story{display:none;position:relative;z-index:1}
+.progress-wrap{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(2,13,26,.9);backdrop-filter:blur(8px);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--warm));border-radius:3px;transition:width .5s}
+.page-counter{font-family:'Baloo 2',cursive;font-size:.85rem;color:rgba(255,255,255,.6);white-space:nowrap}
+.scene{display:none;min-height:calc(100vh - var(--NAV));padding:70px 20px var(--NAV);flex-direction:column;align-items:center}
+.scene.active{display:flex}
+.visual{width:100%;max-width:580px;border-radius:20px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.visual svg{display:block;width:100%}
+.text-card{background:rgba(255,255,255,.97);border-radius:20px;padding:1.4rem 1.6rem;max-width:580px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);margin-bottom:.8rem}
+.scene-title{font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;color:var(--sky2);margin-bottom:.5rem}
+.scene-text{font-size:1.05rem;line-height:1.75;color:#2C2C2A}
+.scene-text strong{color:var(--sky2)}
+.ibn-arabi{margin-top:.9rem;padding:.7rem 1rem;background:linear-gradient(135deg,#fef9e7,#fdebd0);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;font-size:.9rem;color:#7d6608;font-style:italic;line-height:1.6}
+.ibn-arabi::before{content:'✨ ';font-style:normal}
+.tap-hint{font-size:.85rem;color:rgba(255,255,255,.55);text-align:center;margin-bottom:.6rem;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.popup-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px}
+.popup-overlay.open{display:flex}
+.popup-box{background:white;border-radius:24px;padding:2rem;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.popup-emoji{font-size:56px;margin-bottom:.8rem}
+.popup-title{font-family:'Baloo 2',cursive;font-size:1.3rem;color:var(--sky2);margin-bottom:.5rem}
+.popup-text{font-size:1rem;line-height:1.6;color:#2C2C2A;margin-bottom:1.2rem}
+.popup-close{background:linear-gradient(135deg,var(--sky2),var(--sky3));color:white;border:none;border-radius:50px;padding:10px 32px;font-family:'Baloo 2',cursive;font-size:1rem;cursor:pointer}
+.choice-q{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:700;color:var(--cream);text-align:center;margin-bottom:1.2rem;max-width:520px;line-height:1.4}
+.choice-btn{display:block;width:100%;max-width:520px;margin-bottom:10px;padding:13px 18px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);border-radius:14px;color:white;font-size:1rem;font-weight:600;cursor:pointer;text-align:left;transition:all .2s}
+.choice-btn:hover{background:rgba(255,255,255,.22);border-color:var(--gold)}
+.choice-response{background:rgba(255,255,255,.97);border-radius:20px;padding:1.5rem;max-width:520px;width:100%;text-align:center;display:none;margin-top:1rem}
+.choice-response.open{display:block}
+.choice-response p{font-size:1rem;line-height:1.7;color:#2C2C2A;margin-bottom:1rem}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--NAV);background:rgba(2,13,26,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(249,202,36,.2);display:none;align-items:center;justify-content:space-between;padding:0 20px;gap:12px;z-index:50}
+.bottom-nav.visible{display:flex}
+.nav-btn{min-width:90px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:50px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.2)}
+.nav-btn:disabled{opacity:.25;cursor:default}
+.nav-next{background:linear-gradient(135deg,var(--gold),var(--warm));color:#2C2C2A;border:none}
+.nav-next:hover{transform:scale(1.04)}
+.nav-dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:200px}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s}
+.nav-dot.active{background:var(--gold);width:14px;border-radius:3px}
+.play-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--sky2),var(--sky1));border:1.5px solid rgba(74,159,212,.6);color:white;font-size:18px;cursor:pointer;box-shadow:0 4px 14px rgba(26,58,110,.5);transition:transform .15s;flex-shrink:0}
+.play-btn:hover{transform:scale(1.1)}
+.play-btn.playing{background:linear-gradient(135deg,#041a38,#020d1a)}
+.time-display{font-family:'Baloo 2',cursive;font-size:.8rem;color:rgba(255,255,255,.55);min-width:28px;text-align:center}
+.ending-title{font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;color:var(--gold);text-align:center;margin-bottom:.4rem}
+.reflection-box{background:rgba(255,255,255,.1);border:2px solid rgba(249,202,36,.4);border-radius:20px;padding:1.4rem;max-width:480px;width:100%;text-align:center;margin-bottom:1rem}
+.reflection-q{font-family:'Baloo 2',cursive;font-size:1.1rem;color:var(--gold);margin-bottom:.8rem}
+.lesson-card{background:rgba(255,255,255,.1);border:1.5px solid rgba(249,202,36,.35);border-radius:14px;padding:.9rem 1rem;display:flex;align-items:center;gap:12px;margin-bottom:8px;max-width:480px;width:100%;text-align:left}
+.lesson-icon{font-size:26px;flex-shrink:0}
+.lesson-title{font-family:'Baloo 2',cursive;font-size:.95rem;color:var(--gold);margin-bottom:1px}
+.lesson-body{font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.5}
+.restart-btn{background:linear-gradient(135deg,var(--gold),var(--warm));border:none;border-radius:50px;padding:14px 40px;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:700;color:#2C2C2A;cursor:pointer;margin-top:.5rem}
+.dua-box{background:rgba(10,37,64,.6);border:1.5px solid rgba(74,159,212,.4);border-radius:14px;padding:1rem;max-width:480px;width:100%;text-align:center;margin-bottom:1rem}
+.dua-arabic{font-size:18px;color:#74b9ff;font-family:serif;line-height:1.85;margin-bottom:4px}
+.dua-phonetic{font-size:12px;color:rgba(116,185,255,.7);font-style:italic;margin-bottom:4px;letter-spacing:.5px}
+.dua-label{font-size:10px;color:rgba(116,185,255,.5);letter-spacing:1px}
+.dark-card{background:rgba(2,13,26,.85);border:1.5px solid rgba(116,185,255,.2);border-radius:16px;padding:1.2rem 1.4rem;max-width:520px;width:100%;margin-bottom:.7rem}
+.dark-card p{font-size:13px;line-height:1.75;color:var(--cream);margin-bottom:.6rem}
+.dark-card strong{color:#74b9ff}
+.darkness-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:.6rem}
+.chip{font-size:11px;padding:3px 9px;border-radius:7px;font-weight:600}
+.thought-box{background:rgba(26,58,110,.3);border:1.5px solid rgba(116,185,255,.25);border-radius:16px;padding:.9rem 1.1rem;max-width:520px;width:100%;font-size:12.5px;color:var(--cream);line-height:1.7;font-style:italic;margin-bottom:.7rem}
+.tappable{cursor:pointer;transition:filter .2s}
+.tappable:hover{filter:brightness(1.3) drop-shadow(0 0 8px rgba(249,202,36,.7))}
+.dark-reveal{cursor:pointer;transition:all .35s;opacity:.3}
+.dark-reveal.lit{opacity:1;filter:drop-shadow(0 0 10px rgba(116,185,255,.8))}
+.dua-word{cursor:pointer;padding:4px 8px;border-radius:8px;transition:all .25s;display:inline-block;margin:2px}
+.dua-word:hover{background:rgba(249,202,36,.15)}
+.dua-word.tapped{background:rgba(249,202,36,.25);color:#f9ca24;font-weight:700}
+.mercy-item{cursor:pointer;border-radius:14px;border:2px solid transparent;padding:.7rem 1rem;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;max-width:480px;width:100%;text-align:left;transition:all .3s;background:rgba(255,255,255,.06)}
+.mercy-item:hover{border-color:rgba(249,202,36,.4);background:rgba(255,255,255,.12)}
+.mercy-item.revealed{border-color:rgba(249,202,36,.6);background:rgba(249,202,36,.08)}
+.mercy-item-top{display:flex;align-items:center;gap:12px}
+.mercy-reveal{font-size:.82rem;color:var(--cream);max-height:0;overflow:hidden;transition:max-height .4s ease,opacity .4s;opacity:0;line-height:1.5;padding-left:2px}
+.mercy-item.revealed .mercy-reveal{max-height:80px;opacity:1}
+.jonah-voice{cursor:pointer;transition:filter .2s}
+.jonah-voice:hover{filter:brightness(1.4) drop-shadow(0 0 12px rgba(116,185,255,.9))}
+.ark-bob{animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.cloud-drift{animation:cdrift 8s ease-in-out infinite}
+@keyframes cdrift{0%,100%{transform:translateX(0)}50%{transform:translateX(12px)}}
+.sun-pulse{animation:sunpulse 3s ease-in-out infinite}
+@keyframes sunpulse{0%,100%{opacity:.15}50%{opacity:.35}}
+.whale-swim{animation:whaleswim 6s ease-in-out infinite}
+@keyframes whaleswim{0%,100%{transform:translateX(0) translateY(0)}33%{transform:translateX(-15px) translateY(5px)}66%{transform:translateX(10px) translateY(-8px)}}
+.bubble{animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0);opacity:.7}100%{transform:translateY(-80px);opacity:0}}
+.glow-pulse{animation:glowpulse 2s ease-in-out infinite}
+@keyframes glowpulse{0%,100%{opacity:.4}50%{opacity:1}}
+.lightning{animation:flash 5s ease-in-out infinite}
+@keyframes flash{0%,80%,100%{opacity:0}82%,84%{opacity:1}83%,85%{opacity:0}86%{opacity:.7}87%{opacity:0}}
+.wave-anim{animation:waveflow 3s ease-in-out infinite}
+@keyframes waveflow{0%,100%{d:path("M0,30 Q80,10 160,30 Q240,50 320,30 Q400,10 480,30")}50%{d:path("M0,20 Q80,40 160,20 Q240,0 320,20 Q400,40 480,20")}}
+@media(max-width:420px){.scene{padding:65px 12px var(--NAV)}.text-card{padding:1rem 1.1rem}.scene-title{font-size:1.2rem}.scene-text{font-size:.95rem}}
+@media(hover:none){.nav-btn{min-height:44px}.tappable{-webkit-tap-highlight-color:rgba(249,202,36,.3)}}
+</style>
+</head>
+<body>
+<audio id="storyAudio" preload="auto"></audio>
+<div class="stars" id="stars"></div>
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <div class="popup-emoji" id="popup-emoji"></div>
+    <div class="popup-title" id="popup-title"></div>
+    <div class="popup-text" id="popup-text"></div>
+    <button class="popup-close" onclick="closePopup()">Close ✨</button>
+  </div>
+</div>
+<div id="cover">
+  <div class="cover-whale">🐋</div>
+  <div class="cover-title">Prophet Jonah</div>
+  <div class="cover-sub">In the Belly of the Whale 🌊</div>
+  <div class="cover-verse">"And he called out through the darknesses: There is no god but You — Glory be to You — I have been of the wrongdoers." — Quran 21:87</div>
+  <button class="start-btn" onclick="startStory()">Begin the Story ✨</button>
+</div>
+<div id="story">
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="page-counter" id="pageCounter">1 / 13</span>
+  </div>
+
+<!-- PAGE 1: Jonah and His People -->
+<div class="scene" id="s0">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g0sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#060d1a"/><stop offset="100%" stop-color="#0d2240"/></linearGradient>
+      <radialGradient id="g0fire" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6000" stop-opacity=".6"/><stop offset="100%" stop-color="#ff6000" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g0sky)"/>
+    <!-- Stars -->
+    <circle cx="60" cy="20" r="1.5" fill="white" opacity=".8"><animate attributeName="opacity" values=".3;1;.3" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="160" cy="12" r="2" fill="#FFF9C4" opacity=".7"><animate attributeName="opacity" values=".2;.9;.2" dur="3.5s" repeatCount="indefinite" begin=".5s"/></circle>
+    <circle cx="280" cy="25" r="1.5" fill="white" opacity=".85"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite" begin="1s"/></circle>
+    <circle cx="400" cy="10" r="2" fill="#FFF9C4" opacity=".9"><animate attributeName="opacity" values=".3;1;.3" dur="4s" repeatCount="indefinite" begin=".2s"/></circle>
+    <!-- Crescent moon -->
+    <circle cx="430" cy="45" r="26" fill="#FFFDE7" opacity=".9"/>
+    <circle cx="442" cy="37" r="22" fill="#060d1a"/>
+    <!-- City of Nineveh — distant silhouette -->
+    <rect x="60"  y="190" width="30" height="60" rx="3" fill="#0a1a30"/>
+    <rect x="95"  y="175" width="25" height="75" rx="3" fill="#0d2240"/>
+    <rect x="125" y="185" width="35" height="65" rx="3" fill="#0a1a30"/>
+    <rect x="165" y="170" width="28" height="80" rx="3" fill="#0d2240"/>
+    <rect x="198" y="180" width="22" height="70" rx="3" fill="#091428"/>
+    <rect x="225" y="188" width="30" height="62" rx="3" fill="#0a1a30"/>
+    <!-- Idol torches glowing -->
+    <ellipse cx="110" cy="175" rx="15" ry="12" fill="url(#g0fire)"><animate attributeName="opacity" values=".5;1;.5" dur="1.8s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="178" cy="168" rx="13" ry="10" fill="url(#g0fire)"><animate attributeName="opacity" values=".4;.9;.4" dur="2.2s" repeatCount="indefinite" begin=".4s"/></ellipse>
+    <ellipse cx="238" cy="178" rx="12" ry="10" fill="url(#g0fire)"><animate attributeName="opacity" values=".3;.8;.3" dur="1.6s" repeatCount="indefinite" begin=".8s"/></ellipse>
+    <!-- Idol flames -->
+    <path d="M110,168 Q107,160 110,154 Q113,160 110,168Z" fill="#FF6000" opacity=".9"><animate attributeName="d" values="M110,168 Q107,160 110,154 Q113,160 110,168Z;M110,168 Q105,158 109,152 Q114,158 110,168Z" dur=".7s" repeatCount="indefinite"/></path>
+    <path d="M178,162 Q175,155 178,149 Q181,155 178,162Z" fill="#FF8000" opacity=".8"><animate attributeName="d" values="M178,162 Q175,155 178,149 Q181,155 178,162Z;M178,162 Q173,153 177,147 Q183,153 178,162Z" dur=".9s" repeatCount="indefinite" begin=".3s"/></path>
+    <!-- Ground -->
+    <rect x="0" y="248" width="480" height="32" fill="#040d1a"/>
+    <!-- People bowing -->
+    <rect x="300" y="230" width="18" height="15" rx="4" fill="#0a1a30"><animateTransform attributeName="transform" type="rotate" values="0 309 244;20 309 244;0 309 244" dur="2.5s" repeatCount="indefinite"/></rect>
+    <rect x="330" y="234" width="16" height="13" rx="4" fill="#0a1a30"><animateTransform attributeName="transform" type="rotate" values="0 338 246;18 338 246;0 338 246" dur="3s" repeatCount="indefinite" begin=".5s"/></rect>
+    <rect x="358" y="230" width="18" height="15" rx="4" fill="#0a1a30"><animateTransform attributeName="transform" type="rotate" values="0 367 244;22 367 244;0 367 244" dur="2.8s" repeatCount="indefinite" begin=".9s"/></rect>
+    <!-- Jonah standing apart — tappable -->
+    <g class="jonah-voice" onclick="popup(1)">
+      <circle cx="420" cy="222" r="10" fill="rgba(116,185,255,.7)"/>
+      <ellipse cx="420" cy="212" rx="10" ry="6" fill="rgba(26,82,160,.6)"/>
+      <rect x="411" y="231" width="18" height="22" rx="5" fill="rgba(116,185,255,.45)"/>
+      <line x1="411" y1="238" x2="397" y2="230" stroke="rgba(116,185,255,.6)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="429" y1="238" x2="443" y2="230" stroke="rgba(116,185,255,.6)" stroke-width="4" stroke-linecap="round"/>
+      <!-- Speech bubble hint -->
+      <circle cx="440" cy="208" r="8" fill="rgba(249,202,36,.7)"><animate attributeName="opacity" values=".5;1;.5" dur="1.8s" repeatCount="indefinite"/></circle>
+      <text x="440" y="213" text-anchor="middle" font-size="10" fill="#2C2C2A">💬</text>
+    </g>
+  </svg></div>
+  <p class="tap-hint">💬 Tap Jonah to hear what he said!</p>
+  <div class="text-card">
+    <div class="scene-title">🌙 Jonah and His People</div>
+    <div class="scene-text">Long ago, in a great city called <strong>Nineveh</strong>, people had forgotten Allah.<br><br>They bowed to statues and refused to listen.<br><br>Allah sent a man named <strong>Jonah</strong> — peace be upon him — to call them back. Jonah called and called. But the people laughed and turned away.<br><br>And Jonah's heart grew heavy.</div>
+    <div class="ibn-arabi">Ibn ʿArabī teaches: the wisdom of Jonah is the wisdom of the <em>nafas</em> — the breath and the soul. Every soul carries the breath of the Merciful inside it. Even when people forget Allah, that breath never leaves them.</div>
+  </div>
+</div>
+
+<!-- PAGE 2: Jonah Leaves Without Permission -->
+<div class="scene" id="s1">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g1sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1e36"/><stop offset="100%" stop-color="#0d3b6e"/></linearGradient>
+      <linearGradient id="g1sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d3b6e"/><stop offset="100%" stop-color="#020d1a"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g1sky)"/>
+    <!-- Night sky stars -->
+    <circle cx="80" cy="25" r="1.5" fill="white" opacity=".7"><animate attributeName="opacity" values=".2;.8;.2" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="200" cy="15" r="2" fill="#FFF9C4"><animate attributeName="opacity" values=".3;1;.3" dur="2.5s" repeatCount="indefinite" begin=".3s"/></circle>
+    <circle cx="350" cy="30" r="1.5" fill="white" opacity=".8"><animate attributeName="opacity" values=".2;.9;.2" dur="3.8s" repeatCount="indefinite" begin=".7s"/></circle>
+    <circle cx="440" cy="20" r="2" fill="#FFF9C4"><animate attributeName="opacity" values=".3;1;.3" dur="2.2s" repeatCount="indefinite" begin="1s"/></circle>
+    <!-- Sea calm -->
+    <path d="M0,200 Q120,185 240,200 Q360,215 480,200 L480,280 L0,280Z" fill="url(#g1sea)"/>
+    <path d="M0,210 Q80,198 160,210 Q240,222 320,210 Q400,198 480,210" stroke="rgba(116,185,255,.3)" stroke-width="1.5" fill="none"/>
+    <!-- Ship -->
+    <g class="ark-bob">
+      <path d="M120,195 Q160,208 280,210 Q360,208 380,195 L375,170 L125,170Z" fill="#5D3A1A"/>
+      <path d="M125,173 L375,173 L370,192 Q250,206 130,192Z" fill="#8B5E3C"/>
+      <!-- Mast -->
+      <rect x="247" y="120" width="6" height="55" rx="2" fill="#4A2810"/>
+      <!-- Sail -->
+      <path d="M253,125 L310,148 L253,165Z" fill="#f0d9b5" opacity=".9"/>
+      <!-- Cabin -->
+      <rect x="160" y="148" width="130" height="26" rx="4" fill="#6B3A1A"/>
+      <rect x="165" y="153" width="120" height="18" rx="3" fill="#A07040"/>
+    </g>
+    <!-- Jonah on shore — walking away from city -->
+    <circle cx="60" cy="198" r="11" fill="#E8956A"/>
+    <ellipse cx="60" cy="187" rx="11" ry="7" fill="#5D3A1A"/>
+    <rect x="51" y="208" width="18" height="26" rx="6" fill="#4A7BBB"/>
+    <!-- Walking stick -->
+    <line x1="69" y1="234" x2="75" y2="196" stroke="#8B4513" stroke-width="3" stroke-linecap="round"/>
+    <!-- City behind him -->
+    <rect x="0" y="190" width="15" height="70" rx="2" fill="#061222" opacity=".7"/>
+    <rect x="0" y="180" width="10" height="80" rx="2" fill="#061222" opacity=".5"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🚢 Jonah Leaves</div>
+    <div class="scene-text">Jonah became frustrated. He felt his people would never listen.<br><br>So he <strong>left — without Allah's permission</strong>. He walked to the sea and boarded a ship, deciding his mission was over.<br><br>But a prophet cannot simply walk away from what Allah has given him.<br><br>The sea knew something Jonah did not yet know.</div>
+    <div class="ibn-arabi">Ibn ʿArabī teaches: we cannot run away from our own soul. Wherever Jonah went, Allah was already there — waiting, not with anger, but with a lesson wrapped in mercy.</div>
+  </div>
+</div>
+
+<!-- PAGE 3: The Storm and the Lots -->
+<div class="scene" id="s2">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g2storm" cx="50%" cy="20%" r="80%"><stop offset="0%" stop-color="#1a2a40"/><stop offset="100%" stop-color="#060c18"/></radialGradient>
+      <linearGradient id="g2sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a2540"/><stop offset="100%" stop-color="#020810"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g2storm)"/>
+    <!-- Storm clouds -->
+    <ellipse cx="100" cy="38" rx="85" ry="35" fill="#1e2d40"/>
+    <ellipse cx="190" cy="25" rx="75" ry="30" fill="#253545"/>
+    <ellipse cx="330" cy="42" rx="95" ry="38" fill="#1e2d40"/>
+    <ellipse cx="430" cy="28" rx="70" ry="32" fill="#253545"/>
+    <!-- Lightning -->
+    <path d="M210,72 L198,112 L210,112 L194,152" stroke="#f9ca24" stroke-width="3" fill="none" class="lightning"/>
+    <path d="M340,65 L330,105 L342,105 L326,148" stroke="#f9ca24" stroke-width="2.5" fill="none" class="lightning" style="animation-delay:2.2s"/>
+    <!-- Heavy rain -->
+    <line x1="50"  y1="100" x2="44"  y2="125" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur="1.1s" repeatCount="indefinite" begin="0s"/></line>
+    <line x1="110" y1="90"  x2="104" y2="115" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur=".9s" repeatCount="indefinite" begin=".2s"/></line>
+    <line x1="180" y1="105" x2="174" y2="130" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur="1.2s" repeatCount="indefinite" begin=".1s"/></line>
+    <line x1="260" y1="95"  x2="254" y2="120" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur=".8s" repeatCount="indefinite" begin=".4s"/></line>
+    <line x1="350" y1="108" x2="344" y2="133" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur="1s" repeatCount="indefinite" begin=".3s"/></line>
+    <line x1="430" y1="98"  x2="424" y2="123" stroke="#74b9ff" stroke-width="1.5"><animate attributeName="opacity" values="0;.8;0" dur="1.3s" repeatCount="indefinite" begin=".6s"/></line>
+    <!-- Rough waves -->
+    <path d="M0,200 Q40,185 80,200 Q120,215 160,200 Q200,185 240,200 Q280,215 320,200 Q360,185 400,200 Q440,215 480,200 L480,280 L0,280Z" fill="url(#g2sea)">
+      <animateTransform attributeName="transform" type="translate" values="0 0;-20 -5;0 0" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+    <!-- Ship tilting in storm -->
+    <g transform="rotate(-8 240 185)" class="ark-bob">
+      <path d="M130,185 Q180,198 280,200 Q350,198 370,185 L366,162 L134,162Z" fill="#5D3A1A"/>
+      <rect x="170" y="140" width="120" height="24" rx="4" fill="#6B3A1A"/>
+      <rect x="245" y="108" width="5" height="56" rx="2" fill="#4A2810"/>
+    </g>
+    <!-- People on deck throwing lots -->
+    <circle cx="185" cy="158" r="8" fill="#D4A070"/>
+    <circle cx="210" cy="155" r="8" fill="#C89060"/>
+    <circle cx="235" cy="158" r="8" fill="#E8956A"/>
+    <!-- Jonah about to be thrown -->
+    <circle cx="310" cy="152" r="9" fill="#E8956A"/>
+    <rect x="302" y="161" width="16" height="20" rx="5" fill="#4A7BBB"/>
+    <text x="310" y="195" text-anchor="middle" font-size="16" class="tappable" onclick="popup(0)">🎲</text>
+  </svg></div>
+  <p class="tap-hint">🎲 Tap the dice to find out what happened!</p>
+  <div class="text-card">
+    <div class="scene-title">⛈️ The Storm!</div>
+    <div class="scene-text">A terrible storm came. The waves grew huge. The ship was going to sink!<br><br>The sailors were afraid. They thought the storm was a punishment — someone on the ship had done wrong.<br><br>They drew lots to find out who. <em>"And he drew lots and was among the losers."</em> (Quran 37:141)<br><br>The lot fell to <strong>Jonah</strong>. Three times. Each time — Jonah.<br><br>And so he jumped into the sea — and a great whale swallowed him whole.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: Allah uses the whole universe to speak to His beloved ones. Even a storm, even a lot drawn by chance — is Allah calling you back to yourself.</div>
+  </div>
+</div>
+
+<!-- PAGE 4: CHOICE -->
+<div class="scene" id="s3" style="justify-content:center;padding-top:80px">
+  <div style="font-size:60px;animation:float 2s ease-in-out infinite;margin-bottom:1.2rem">🐋</div>
+  <div class="choice-q">Jonah was thrown into the dark, cold sea — and then swallowed by a whale.<br><br>How do you think he felt inside the darkness? 🤔</div>
+  <button class="choice-btn" onclick="chooseAnswer(0)">😨 Terrified — alone in total darkness</button>
+  <button class="choice-btn" onclick="chooseAnswer(1)">😔 Sorry — he knew he had made a mistake</button>
+  <button class="choice-btn" onclick="chooseAnswer(2)">🙏 He remembered Allah — and prayed</button>
+  <div class="choice-response" id="choiceResp">
+    <div style="font-size:48px;margin-bottom:.8rem" id="choiceEmoji">💙</div>
+    <p id="choiceText"></p>
+    <button class="nav-btn nav-next" onclick="goTo(4)" style="margin-top:.5rem">Continue the story →</button>
+  </div>
+</div>
+
+<!-- PAGE 5: Into the Whale — Three Darknesses -->
+<div class="scene" id="s4">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g4deep" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#0a1e36"/><stop offset="100%" stop-color="#000508"/></radialGradient>
+      <radialGradient id="g4glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#1a4a6e" stop-opacity=".5"/><stop offset="100%" stop-color="#000508" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="480" height="280" fill="#000508"/>
+    <rect width="480" height="280" fill="url(#g4deep)"/>
+    <!-- Darkness labels — tappable to reveal -->
+    <g id="dark1" class="dark-reveal" onclick="revealDarkness('dark1')">
+      <rect x="80" y="18" width="320" height="20" rx="10" fill="rgba(116,185,255,.08)"/>
+      <text x="240" y="32" text-anchor="middle" font-size="10" fill="rgba(116,185,255,.9)" font-family="'Nunito',sans-serif">🌙 DARKNESS OF THE NIGHT — tap me!</text>
+    </g>
+    <g id="dark2" class="dark-reveal" onclick="revealDarkness('dark2')">
+      <rect x="70" y="36" width="340" height="20" rx="10" fill="rgba(116,185,255,.08)"/>
+      <text x="240" y="50" text-anchor="middle" font-size="10" fill="rgba(116,185,255,.9)" font-family="'Nunito',sans-serif">🌊 DARKNESS OF THE DEEP SEA — tap me!</text>
+    </g>
+    <g id="dark3" class="dark-reveal" onclick="revealDarkness('dark3')">
+      <rect x="55" y="54" width="370" height="20" rx="10" fill="rgba(116,185,255,.08)"/>
+      <text x="240" y="68" text-anchor="middle" font-size="10" fill="rgba(116,185,255,.9)" font-family="'Nunito',sans-serif">🐋 DARKNESS OF THE WHALE'S BELLY — tap me!</text>
+    </g>
+    <!-- Whale body -->
+    <ellipse cx="240" cy="170" rx="185" ry="85" fill="#0a1828"/>
+    <ellipse cx="220" cy="165" rx="165" ry="72" fill="#0d2035"/>
+    <!-- Whale details -->
+    <ellipse cx="390" cy="170" rx="55" ry="40" fill="#0a1828"/>
+    <!-- Whale eye -->
+    <circle cx="90" cy="148" r="12" fill="#0d2035"/>
+    <circle cx="90" cy="148" r="7" fill="#061018"/>
+    <circle cx="87" cy="145" r="2.5" fill="rgba(116,185,255,.6)" class="glow-pulse"/>
+    <!-- Whale mouth line -->
+    <path d="M55,170 Q80,185 110,178" stroke="rgba(116,185,255,.15)" stroke-width="2" fill="none"/>
+    <!-- Jonah inside — tiny, glowing faintly -->
+    <circle cx="240" cy="168" r="10" fill="rgba(232,149,106,.4)" class="glow-pulse"/>
+    <ellipse cx="240" cy="158" rx="10" ry="6" fill="rgba(93,58,26,.3)"/>
+    <rect x="231" y="177" width="18" height="22" rx="5" fill="rgba(74,123,187,.3)"/>
+    <!-- Hands raised in prayer -->
+    <line x1="231" y1="184" x2="218" y2="176" stroke="rgba(232,149,106,.4)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="249" y1="184" x2="262" y2="176" stroke="rgba(232,149,106,.4)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tiny prayer glow around Jonah -->
+    <circle cx="240" cy="172" r="28" fill="none" stroke="rgba(249,202,36,.15)" stroke-width="1.5" class="glow-pulse"/>
+    <circle cx="240" cy="172" r="40" fill="none" stroke="rgba(249,202,36,.08)" stroke-width="1" class="glow-pulse" style="animation-delay:.5s"/>
+    <!-- Bubbles -->
+    <circle cx="180" cy="140" r="4" fill="none" stroke="rgba(116,185,255,.3)" stroke-width="1.5" class="bubble" style="animation-duration:3s;animation-delay:0s"/>
+    <circle cx="300" cy="155" r="3" fill="none" stroke="rgba(116,185,255,.25)" stroke-width="1" class="bubble" style="animation-duration:4s;animation-delay:1s"/>
+    <circle cx="200" cy="165" r="2.5" fill="none" stroke="rgba(116,185,255,.2)" stroke-width="1" class="bubble" style="animation-duration:3.5s;animation-delay:.5s"/>
+    <!-- Whale tail -->
+    <path d="M390,145 Q430,125 445,155 Q430,175 390,165Z" fill="#0a1828"/>
+  </svg></div>
+  <p class="tap-hint">☝️ Tap each darkness to feel it!</p>
+  <div class="text-card">
+    <div class="scene-title">🐋 Three Darknesses</div>
+    <div class="scene-text">Jonah was thrown into the sea — and a great whale swallowed him whole.<br><br>The Quran tells us he was surrounded by <strong>three darknesses</strong>: the darkness of the night, the darkness of the deep sea, and the darkness of the whale's belly.<br><br>He was alone. Completely alone.<br><br>Or so it seemed.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: the belly of the whale is an image of the soul's deepest trial. When everything is dark and silent — that is when Allah is most near. The darkness is not a punishment. It is a conversation.</div>
+  </div>
+</div>
+
+<!-- PAGE 6: The Du'a in the Dark -->
+<div class="scene" id="s5">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g5glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f9ca24" stop-opacity=".25"/><stop offset="100%" stop-color="#f9ca24" stop-opacity="0"/></radialGradient>
+      <radialGradient id="g5deep" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#0a1e36"/><stop offset="100%" stop-color="#000508"/></radialGradient>
+    </defs>
+    <rect width="480" height="280" fill="#000508"/>
+    <rect width="480" height="280" fill="url(#g5deep)"/>
+    <!-- Expanding light rings from prayer -->
+    <circle cx="240" cy="155" r="35" fill="none" stroke="rgba(249,202,36,.35)" stroke-width="2"><animate attributeName="r" values="30;70;30" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".5;0;.5" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="240" cy="155" r="55" fill="none" stroke="rgba(249,202,36,.2)" stroke-width="1.5"><animate attributeName="r" values="50;100;50" dur="3s" repeatCount="indefinite" begin=".5s"/><animate attributeName="opacity" values=".4;0;.4" dur="3s" repeatCount="indefinite" begin=".5s"/></circle>
+    <circle cx="240" cy="155" r="80" fill="none" stroke="rgba(249,202,36,.1)" stroke-width="1"><animate attributeName="r" values="75;130;75" dur="3s" repeatCount="indefinite" begin="1s"/><animate attributeName="opacity" values=".3;0;.3" dur="3s" repeatCount="indefinite" begin="1s"/></circle>
+    <!-- Central golden glow -->
+    <circle cx="240" cy="155" r="45" fill="url(#g5glow)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>
+    <!-- Jonah praying — glowing -->
+    <circle cx="240" cy="138" r="14" fill="#E8956A"/>
+    <ellipse cx="240" cy="126" rx="14" ry="9" fill="#5D3A1A"/>
+    <rect x="228" y="151" width="24" height="30" rx="7" fill="#4A7BBB"/>
+    <!-- Arms raised in du'a -->
+    <ellipse cx="214" cy="162" rx="16" ry="6" fill="#f0d9b5" transform="rotate(-25,214,162)"/>
+    <ellipse cx="266" cy="162" rx="16" ry="6" fill="#f0d9b5" transform="rotate(25,266,162)"/>
+    <!-- Arabic du'a text floating upward -->
+    <text x="240" y="68" text-anchor="middle" font-size="18" fill="rgba(249,202,36,.7)" font-family="serif" class="glow-pulse">لَّآ إِلَـٰهَ إِلَّآ أَنتَ</text>
+    <text x="240" y="92" text-anchor="middle" font-size="15" fill="rgba(249,202,36,.5)" font-family="serif" class="glow-pulse" style="animation-delay:.3s">سُبْحَـٰنَكَ</text>
+    <text x="240" y="112" text-anchor="middle" font-size="13" fill="rgba(249,202,36,.35)" font-family="serif" class="glow-pulse" style="animation-delay:.6s">إِنِّى كُنتُ مِنَ ٱلظَّـٰلِمِينَ</text>
+    <!-- Bubbles -->
+    <circle cx="160" cy="180" r="5" fill="none" stroke="rgba(249,202,36,.2)" stroke-width="1.5" class="bubble" style="animation-duration:4s"/>
+    <circle cx="320" cy="175" r="4" fill="none" stroke="rgba(249,202,36,.15)" stroke-width="1" class="bubble" style="animation-duration:3s;animation-delay:1s"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🤲 The Prayer in the Dark</div>
+    <div class="scene-text">In the deepest darkness, Jonah remembered Allah.<br><br>And he called out — with his whole heart:<br><br><em>"There is no god but You — Glory be to You — I have certainly been among the wrongdoers."</em> (Quran 21:87)<br><br>He did not ask for anything. He only <strong>remembered Allah</strong> and admitted his mistake.<br><br>And that was enough.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: the most powerful prayer is not a request — it is a recognition. When the soul says <em>laa ilaaha illa anta</em> — "there is no god but You" — the whole universe breathes with it.</div>
+  </div>
+</div>
+
+<!-- PAGE 7: Allah Answers — The Whale Releases Jonah -->
+<div class="scene" id="s6">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g6dawn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a60"/><stop offset="40%" stop-color="#0a2040"/><stop offset="100%" stop-color="#040d1a"/></linearGradient>
+      <radialGradient id="g6sunrise" cx="50%" cy="0%" r="70%"><stop offset="0%" stop-color="#FF8C00" stop-opacity=".5"/><stop offset="100%" stop-color="#1a3a60" stop-opacity="0"/></radialGradient>
+      <linearGradient id="g6water" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a2540"/><stop offset="100%" stop-color="#020d1a"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g6dawn)"/>
+    <rect width="480" height="140" fill="url(#g6sunrise)"/>
+    <!-- Dawn glow -->
+    <ellipse cx="240" cy="0" rx="200" ry="80" fill="#FF8C00" opacity=".08"/>
+    <!-- Stars fading -->
+    <circle cx="60" cy="22" r="1.5" fill="#FFF9C4" opacity=".4"><animate attributeName="opacity" values=".4;.06;.4" dur="5s" repeatCount="indefinite"/></circle>
+    <circle cx="300" cy="18" r="1.5" fill="white" opacity=".3"><animate attributeName="opacity" values=".3;.04;.3" dur="6s" repeatCount="indefinite"/></circle>
+    <!-- Calm sea -->
+    <path d="M0,195 Q60,184 120,195 Q180,206 240,195 Q300,184 360,195 Q420,206 480,195 L480,280 L0,280Z" fill="url(#g6water)"/>
+    <!-- Whale surfacing — releasing Jonah -->
+    <g class="whale-swim">
+      <ellipse cx="260" cy="210" rx="170" ry="55" fill="#0a1828"/>
+      <ellipse cx="245" cy="206" rx="150" ry="46" fill="#0d2035"/>
+      <circle cx="120" cy="192" r="10" fill="#0d2035"/>
+      <circle cx="120" cy="192" r="6" fill="#061018"/>
+      <circle cx="117" cy="189" r="2" fill="rgba(116,185,255,.5)"/>
+      <path d="M400,190 Q435,172 448,200 Q435,220 400,212Z" fill="#0a1828"/>
+      <!-- Whale mouth open — releasing -->
+      <path d="M80,198 Q100,215 130,208" stroke="rgba(116,185,255,.2)" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Jonah being cast out — onto beach/shore -->
+    <circle cx="68" cy="182" r="11" fill="#E8956A"/>
+    <ellipse cx="68" cy="172" rx="11" ry="7" fill="#5D3A1A"/>
+    <rect x="59" y="192" width="18" height="24" rx="6" fill="#4A7BBB"/>
+    <!-- Jonah exhausted but safe on shore -->
+    <ellipse cx="68" cy="200" rx="22" ry="6" fill="#0a1e30" opacity=".4"/>
+    <!-- Shore / beach -->
+    <path d="M0,218 Q40,210 80,218 Q120,226 160,218 L160,280 L0,280Z" fill="#1a3a1a" opacity=".6"/>
+    <!-- Light ray from above -->
+    <path d="M240,0 L200,195" stroke="rgba(249,202,36,.15)" stroke-width="3" stroke-dasharray="8 6"/>
+    <path d="M240,0 L280,195" stroke="rgba(249,202,36,.1)" stroke-width="2" stroke-dasharray="8 6"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🌅 Allah Answers!</div>
+    <div class="scene-text">Allah heard Jonah's prayer.<br><br>The Quran says: <em>"So We responded to him and rescued him from distress. And thus do We save the believers."</em> (Quran 21:88)<br><br>The whale <strong>cast Jonah onto the shore</strong> — exhausted, but alive. Free.<br><br>From the darkest place in the world — to the open air. To light. To life.</div>
+    <div class="ibn-arabi">Ibn ʿArabī teaches: the moment the soul truly says <em>laa ilaaha illa anta</em> — no power in creation can hold it anymore. Not darkness, not a whale, not despair.</div>
+  </div>
+</div>
+
+<!-- PAGE 8: The Gourd Tree — Allah's Tenderness -->
+<div class="scene" id="s7">
+  <div class="visual"><svg id="svg-p8" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g7sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#74b9ff"/><stop offset="100%" stop-color="#a29bfe"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g7sky)"/>
+    <!-- Warm sun -->
+    <circle cx="400" cy="55" r="42" fill="#FFD54F" opacity=".95"/>
+    <circle cx="400" cy="55" r="62" fill="#FFD54F" opacity=".12" class="sun-pulse"/>
+    <!-- Clouds soft -->
+    <ellipse cx="100" cy="60" rx="65" ry="28" fill="white" opacity=".7" class="cloud-drift"/>
+    <ellipse cx="140" cy="50" rx="48" ry="22" fill="white" opacity=".8" class="cloud-drift"/>
+    <ellipse cx="270" cy="75" rx="55" ry="24" fill="white" opacity=".65" class="cloud-drift"/>
+    <!-- Ground - shore -->
+    <rect x="0" y="220" width="480" height="60" fill="#2d5a1b"/>
+    <rect x="0" y="215" width="480" height="12" fill="#3a7a24"/>
+    <!-- Sea in background -->
+    <path d="M0,200 Q120,188 240,200 Q360,212 480,200 L480,220 L0,220Z" fill="#0a3d6e" opacity=".6"/>
+    <!-- Birds -->
+    <text x="330" y="90" font-size="16">🐦</text>
+    <text x="150" y="80" font-size="14">🐦</text>
+
+    <!-- VINE — drawn BEFORE Jonah so it stays behind him -->
+    <g id="p8-vine" style="opacity:0;transition:opacity .7s ease">
+      <rect x="235" y="145" width="10" height="75" rx="5" fill="#5D4037"/>
+      <ellipse cx="195" cy="135" rx="52" ry="30" fill="#2e7d32" transform="rotate(-20,195,135)"/>
+      <ellipse cx="252" cy="118" rx="56" ry="26" fill="#388e3c" transform="rotate(10,252,118)"/>
+      <ellipse cx="298" cy="132" rx="50" ry="27" fill="#2e7d32" transform="rotate(25,298,132)"/>
+      <ellipse cx="218" cy="110" rx="42" ry="21" fill="#43a047"/>
+      <ellipse cx="272" cy="102" rx="40" ry="19" fill="#388e3c"/>
+      <!-- Shade under vine -->
+      <path d="M170,210 Q240,205 310,210" stroke="rgba(46,125,50,.35)" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <text x="200" y="82" text-anchor="middle" font-size="16" class="glow-pulse">✨</text>
+    </g>
+
+    <!-- Jonah resting — drawn AFTER vine so he is always on top -->
+    <circle cx="240" cy="198" r="13" fill="#E8956A"/>
+    <ellipse cx="240" cy="187" rx="13" ry="8" fill="#5D3A1A"/>
+    <rect x="228" y="210" width="24" height="20" rx="6" fill="#4A7BBB"/>
+    <ellipse cx="260" cy="215" rx="18" ry="5" fill="#f0d9b5" transform="rotate(15,260,215)"/>
+    <ellipse cx="220" cy="215" rx="18" ry="5" fill="#f0d9b5" transform="rotate(-15,220,215)"/>
+
+    <!-- GOAT — drawn after Jonah, on the right side, no overlap -->
+    <g id="p8-goat" style="opacity:0;transition:opacity .7s ease">
+      <ellipse cx="370" cy="210" rx="28" ry="16" fill="#e8e0d0"/>
+      <rect x="348" y="222" width="6" height="18" rx="3" fill="#c8bfaf"/>
+      <rect x="360" y="224" width="6" height="16" rx="3" fill="#c8bfaf"/>
+      <rect x="374" y="224" width="6" height="16" rx="3" fill="#c8bfaf"/>
+      <rect x="386" y="222" width="6" height="18" rx="3" fill="#c8bfaf"/>
+      <ellipse cx="344" cy="204" rx="14" ry="11" fill="#e8e0d0"/>
+      <ellipse cx="337" cy="197" rx="5" ry="8" fill="#d4c8b8" transform="rotate(-20,337,197)"/>
+      <circle cx="340" cy="203" r="2.5" fill="#4a3a2a"/>
+      <circle cx="339" cy="202" r="1" fill="white" opacity=".6"/>
+      <path d="M344,195 Q342,185 338,183" stroke="#8B7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M349,194 Q350,184 355,182" stroke="#8B7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M340,213 Q338,220 336,223" stroke="#c8bfaf" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M398,208 Q408,204 406,210" stroke="#c8bfaf" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="365" y="182" text-anchor="middle" font-size="14" class="glow-pulse">🥛</text>
+    </g>
+
+    <!-- FRUITS — drawn last, on top of vine leaves -->
+    <g id="p8-fruits" style="opacity:0;transition:opacity .7s ease">
+      <ellipse cx="215" cy="150" rx="9" ry="14" fill="#7cb342"/>
+      <path d="M215,136 Q217,132 215,129" stroke="#5D4037" stroke-width="2" fill="none"/>
+      <ellipse cx="268" cy="142" rx="9" ry="13" fill="#8bc34a"/>
+      <path d="M268,129 Q270,125 268,122" stroke="#5D4037" stroke-width="2" fill="none"/>
+      <ellipse cx="303" cy="153" rx="8" ry="12" fill="#7cb342"/>
+      <path d="M303,141 Q305,137 303,134" stroke="#5D4037" stroke-width="2" fill="none"/>
+      <ellipse cx="190" cy="157" rx="6" ry="9" fill="#9ccc65"/>
+      <ellipse cx="328" cy="147" rx="6" ry="9" fill="#8bc34a"/>
+      <text x="270" y="170" text-anchor="middle" font-size="16" class="glow-pulse">✨</text>
+    </g>
+  </svg></div>
+  <p class="tap-hint">👆 Tap each gift Allah gave Jonah!</p>
+  <div onclick="revealMercy(this,'p8-vine')" class="mercy-item">
+    <div class="mercy-item-top"><span style="font-size:24px">🌿</span><div><div class="lesson-title">The Gourd Vine</div><div class="lesson-body" style="color:rgba(255,255,255,.6);font-size:.8rem">Tap to reveal...</div></div></div>
+    <div class="mercy-reveal">Allah caused a vine to grow over Jonah — miraculously, instantly. Its large soft leaves gave him cool shade from the burning sun.</div>
+  </div>
+  <div onclick="revealMercy(this,'p8-goat')" class="mercy-item">
+    <div class="mercy-item-top"><span style="font-size:24px">🐐</span><div><div class="lesson-title">The Wild Goat</div><div class="lesson-body" style="color:rgba(255,255,255,.6);font-size:.8rem">Tap to reveal...</div></div></div>
+    <div class="mercy-reveal">A wild goat came to Jonah morning and evening. He could drink its milk and slowly regain his strength — sent by Allah, without Jonah asking.</div>
+  </div>
+  <div onclick="revealMercy(this,'p8-fruits')" class="mercy-item">
+    <div class="mercy-item-top"><span style="font-size:24px">💛</span><div><div class="lesson-title">The Fruit &amp; Rest</div><div class="lesson-body" style="color:rgba(255,255,255,.6);font-size:.8rem">Tap to reveal...</div></div></div>
+    <div class="mercy-reveal">The gourd gave him fruit to eat. He rested, healed, breathed. From the darkest belly in the world — to this gentle shore. <strong style="color:var(--gold)">That is mercy.</strong></div>
+  </div>
+  <div class="text-card" style="max-width:480px;width:100%">
+    <div class="scene-title">🌿 The Gourd Tree</div>
+    <div class="scene-text">The whale cast Jonah onto a bare, open shore — <em>"while he was sick"</em> (Quran 37:145). His skin was raw and burned. He was exhausted, in pain, with no shade and no food.<br><br>So Allah caused a <strong>gourd vine to grow over him</strong> — miraculously, instantly. A wild goat came morning and evening. He healed slowly, gently.<br><br>He went from the darkest belly in the world — to this. <strong>That is mercy.</strong></div>
+    <div class="ibn-arabi">Ibn ʿArabī teaches: Allah's mercy doesn't stop at rescue. It continues — with shade, rest, and tenderness. This is the <em>nafas al-Rahman</em> — the Breath of the Merciful — flowing without end.</div>
+  </div>
+</div>
+
+<!-- PAGE 9: His People Believe -->
+<div class="scene" id="s8">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g8sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a90d9"/><stop offset="100%" stop-color="#87ceeb"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g8sky)"/>
+    <!-- Sun bright -->
+    <circle cx="60" cy="55" r="38" fill="#FFD54F" opacity=".95"/>
+    <circle cx="60" cy="55" r="55" fill="#FFD54F" opacity=".15" class="sun-pulse"/>
+    <!-- Clouds -->
+    <ellipse cx="300" cy="50" rx="60" ry="25" fill="white" opacity=".75" class="cloud-drift"/>
+    <ellipse cx="350" cy="42" rx="45" ry="20" fill="white" opacity=".85" class="cloud-drift"/>
+    <!-- Ground -->
+    <rect x="0" y="225" width="480" height="55" fill="#27ae60"/>
+    <rect x="0" y="220" width="480" height="10" fill="#2ecc71"/>
+    <!-- City of Nineveh — now joyful -->
+    <rect x="30"  y="160" width="30" height="65" rx="4" fill="#1a5276" opacity=".9"/>
+    <rect x="65"  y="150" width="25" height="75" rx="4" fill="#1a5276" opacity=".85"/>
+    <rect x="95"  y="158" width="35" height="67" rx="4" fill="#1a5276" opacity=".9"/>
+    <rect x="135" y="145" width="28" height="80" rx="4" fill="#1a5276" opacity=".85"/>
+    <!-- 100,000 people raising hands — represented as crowd -->
+    <g opacity=".85">
+      <!-- Row 1 -->
+      <circle cx="200" cy="215" r="7" fill="#D4A070"/>
+      <line x1="200" y1="221" x2="200" y2="242" stroke="#8B6040" stroke-width="4"/>
+      <line x1="200" y1="228" x2="192" y2="222" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <line x1="200" y1="228" x2="208" y2="222" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="230" cy="212" r="7" fill="#C89060"/>
+      <line x1="230" y1="218" x2="230" y2="239" stroke="#7A5030" stroke-width="4"/>
+      <line x1="230" y1="225" x2="222" y2="219" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <line x1="230" y1="225" x2="238" y2="219" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="260" cy="215" r="7" fill="#E8956A"/>
+      <line x1="260" y1="221" x2="260" y2="242" stroke="#8B4020" stroke-width="4"/>
+      <line x1="260" y1="228" x2="252" y2="222" stroke="#8B4020" stroke-width="3" stroke-linecap="round"/>
+      <line x1="260" y1="228" x2="268" y2="222" stroke="#8B4020" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="290" cy="212" r="7" fill="#D4A070"/>
+      <line x1="290" y1="218" x2="290" y2="239" stroke="#8B6040" stroke-width="4"/>
+      <line x1="290" y1="225" x2="282" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <line x1="290" y1="225" x2="298" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="320" cy="215" r="7" fill="#C89060"/>
+      <line x1="320" y1="221" x2="320" y2="242" stroke="#7A5030" stroke-width="4"/>
+      <line x1="320" y1="228" x2="312" y2="222" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <line x1="320" y1="228" x2="328" y2="222" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <!-- Row 2 background people -->
+      <circle cx="215" cy="205" r="5" fill="#B87850" opacity=".7"/>
+      <circle cx="245" cy="202" r="5" fill="#C89060" opacity=".7"/>
+      <circle cx="275" cy="205" r="5" fill="#D4A070" opacity=".7"/>
+      <circle cx="305" cy="202" r="5" fill="#B87850" opacity=".7"/>
+      <circle cx="335" cy="205" r="5" fill="#C89060" opacity=".7"/>
+      <!-- Row 3 -->
+      <circle cx="350" cy="215" r="7" fill="#E8956A"/>
+      <line x1="350" y1="221" x2="350" y2="242" stroke="#8B4020" stroke-width="4"/>
+      <line x1="350" y1="228" x2="342" y2="222" stroke="#8B4020" stroke-width="3" stroke-linecap="round"/>
+      <line x1="350" y1="228" x2="358" y2="222" stroke="#8B4020" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="380" cy="212" r="7" fill="#D4A070"/>
+      <line x1="380" y1="218" x2="380" y2="239" stroke="#8B6040" stroke-width="4"/>
+      <line x1="380" y1="225" x2="372" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <line x1="380" y1="225" x2="388" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="410" cy="215" r="7" fill="#C89060"/>
+      <line x1="410" y1="221" x2="410" y2="242" stroke="#7A5030" stroke-width="4"/>
+      <line x1="410" y1="228" x2="402" y2="222" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <line x1="410" y1="228" x2="418" y2="222" stroke="#7A5030" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="440" cy="212" r="7" fill="#D4A070"/>
+      <line x1="440" y1="218" x2="440" y2="239" stroke="#8B6040" stroke-width="4"/>
+      <line x1="440" y1="225" x2="432" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+      <line x1="440" y1="225" x2="448" y2="219" stroke="#8B6040" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <!-- Jonah standing -->
+    <circle cx="155" cy="192" r="13" fill="#E8956A"/>
+    <ellipse cx="155" cy="180" rx="13" ry="8" fill="#5D3A1A"/>
+    <rect x="143" y="204" width="24" height="30" rx="7" fill="#4A7BBB"/>
+    <line x1="143" y1="213" x2="126" y2="204" stroke="#4A7BBB" stroke-width="6" stroke-linecap="round"/>
+    <line x1="167" y1="213" x2="184" y2="204" stroke="#4A7BBB" stroke-width="6" stroke-linecap="round"/>
+    <!-- "100,000" label -->
+    <rect x="170" y="115" width="140" height="28" rx="14" fill="rgba(249,202,36,.15)"/>
+    <text x="240" y="134" text-anchor="middle" font-size="13" fill="#f9ca24" font-family="'Baloo 2',cursive" font-weight="700">100,000 believers</text>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">✨ A Whole City Turns to Allah!</div>
+    <div class="scene-text">While Jonah was still in the whale — something extraordinary happened back in Nineveh.<br><br>The people saw signs of punishment approaching. The sky changed. Fear filled their hearts. And without waiting for Jonah to return — <strong>they repented on their own.</strong><br><br>All of them. Men, women, children — they went out together and cried to Allah. And Allah lifted the punishment.<br><br>Jonah returned to find his people already turned toward Allah. The mission he thought had failed — was already complete.<br><br>The Quran says: <em>"And We sent him to a hundred thousand or more — and they believed."</em> (Quran 37:147-148)</div>
+    <div class="ibn-arabi">Ibn ʿArabī teaches: the prayer said in total darkness, in the belly of a whale — moved an entire city to light. That is the power of a soul that truly remembers Allah.</div>
+  </div>
+</div>
+
+<!-- PAGE 10: Your Darkness -->
+<div class="scene" id="s9" style="justify-content:flex-start;padding-top:80px">
+  <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.8rem;text-align:center;width:100%">🌑</div>
+  <div style="font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:#74b9ff;margin-bottom:.8rem;text-align:center;background:rgba(2,13,26,.9);padding:.4rem 1.4rem;border-radius:12px;max-width:520px;width:100%">Your Three Darknesses.</div>
+  <div class="dark-card">
+    <p>Jonah was in three darknesses at once. <strong>Your darknesses are different — but they are still real.</strong></p>
+    <p style="color:rgba(255,255,255,.75)">Maybe your darkness is a moment when you feel completely alone. Or when you made a mistake and feel ashamed. Or when you are so far from Allah that you don't know how to come back.</p>
+    <p style="font-weight:600;color:#74b9ff"><em>That heavy, dark feeling? That is your whale.</em></p>
+  </div>
+  <div class="dark-card">
+    <p>Jonah's way out was not a ladder or a rope. <strong>It was a word.</strong></p>
+    <div class="darkness-chips">
+      <span class="chip" style="background:rgba(116,185,255,.15);color:#74b9ff">Laa ilaaha illa anta</span>
+      <span class="chip" style="background:rgba(249,202,36,.15);color:#f9ca24">Subhaanaka</span>
+      <span class="chip" style="background:rgba(30,160,90,.15);color:#2ecc71">Inni kuntu minaz-zaalimeen</span>
+    </div>
+    <p style="font-weight:600;color:#74b9ff"><em>In your darkness — you have the same key Jonah had.</em></p>
+    <p style="color:rgba(255,255,255,.8);font-size:13px;line-height:1.7">Say <strong style="color:#74b9ff">Soob-haa-na-llaah</strong> — Allah is perfect and greater than anything that is hurting me.<br>Say <strong style="color:#74b9ff">Laa ilaaha illa Allah</strong> — there is nothing and no one who can save me except Him.<br>Tell Him: <em>I am weak. I need You. Without You, I am nothing.</em><br><br>That honesty — that is your key. That is what opened the whale.</p>
+  </div>
+  <div class="thought-box">💭 Think of one moment when you felt lost or in the dark.<br>What brought the light back? That was Allah answering.</div>
+</div>
+
+<!-- PAGE 11: Your Du'a -->
+<div class="scene" id="s10" style="justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;padding:1rem">
+    <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.8rem">🤲</div>
+    <div style="font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;color:#74b9ff;margin-bottom:1rem">The Most Powerful Prayer</div>
+    <p class="tap-hint" style="margin-bottom:.5rem">👆 Tap each part to learn what it means!</p>
+    <div class="dua-box" style="margin:0 auto 1rem">
+      <div class="dua-arabic" style="line-height:2.2">
+        <span class="dua-word" onclick="popup_inline('Laa ilaaha illa anta — There is no god but You. Only Allah can save me.')">لَّآ إِلَـٰهَ إِلَّآ أَنتَ</span>
+        <span class="dua-word" onclick="popup_inline('Subhaanaka — Glory be to You. You are perfect and I am not.')">سُبْحَـٰنَكَ</span>
+        <span class="dua-word" onclick="popup_inline('Inni kuntu minaz-zaalimeen — I have certainly been among the wrongdoers. I made a mistake — and I admit it.')">إِنِّى كُنتُ مِنَ ٱلظَّـٰلِمِينَ</span>
+      </div>
+      <div class="dua-phonetic" style="margin-top:.5rem">Laa i-laa-ha il-laa an-ta · sub-haa-na-ka · in-ni kun-tu mi-naz-zaa-li-meen</div>
+      <div class="dua-label" style="margin-top:.3rem">JONAH'S DU'A — QURAN 21:87</div>
+    </div>
+    <div class="text-card" style="text-align:left">
+      <div class="scene-text">
+        <em>"There is no god but You — Glory be to You — I have certainly been among the wrongdoers."</em><br><br>
+        The Prophet ﷺ said: <strong>"No Muslim ever calls upon Allah with these words for anything, ever, except that Allah will respond to him."</strong> (At-Tirmidhi)<br><br>
+        This is Jonah's gift to you — a key that opens every locked door, in every darkness.
+      </div>
+      <div class="ibn-arabi">Ibn ʿArabī teaches: this du'a works because it has three movements — recognizing Allah's oneness, glorifying Him, and admitting our own smallness. When the soul is in that position, it is exactly where Allah wants it to be.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 12: Reflection -->
+<div class="scene" id="s11" style="justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;padding:1rem">
+    <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.8rem">🌊</div>
+    <div class="ending-title">Jonah's Gift to Us</div>
+    <div style="font-size:1rem;line-height:1.75;color:var(--cream);text-align:center;margin-bottom:1.2rem">Jonah made a mistake.<br>He ran away.<br>He ended up in the darkest place possible.<br><br>And yet — Allah never let him go.<br><br>Not for one breath.</div>
+    <div class="reflection-box">
+      <div class="reflection-q">💭 A question just for you...</div>
+      <p style="color:rgba(255,255,255,.85);font-size:.95rem;line-height:1.7">Have you ever felt far from Allah?<br><br>Like you made too many mistakes to come back?<br><br><em>Remember Jonah. In the belly of the whale. In three darknesses.<br>And Allah still heard him. He will hear you too.</em> 🤲</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 13: What I Learned -->
+<div class="scene" id="s12" style="justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;padding:1rem">
+    <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.6rem">✨</div>
+    <div class="ending-title">What I Learned</div>
+    <div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.2rem">from the story of Prophet Jonah — peace be upon him</div>
+    <div class="lesson-card"><span class="lesson-icon">🌑</span><div><div class="lesson-title">Allah is with you in the dark</div><div class="lesson-body">Even in three darknesses — inside a whale, under the sea, in the night — Allah heard Jonah. He hears you too.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">🤲</span><div><div class="lesson-title">Admitting mistakes is not weakness</div><div class="lesson-body">Jonah said "I have been among the wrongdoers." That honesty opened the door. Allah loves the one who comes back.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">💙</span><div><div class="lesson-title">No darkness lasts forever</div><div class="lesson-body">The whale released him. The shore appeared. The sun came up. After every darkness, Allah sends light.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">🌿</span><div><div class="lesson-title">Allah's mercy goes beyond rescue</div><div class="lesson-body">He didn't just save Jonah — He gave him shade, rest, and a whole city of believers. Allah's care never stops.</div></div></div>
+    <div class="dua-box" style="margin:1rem auto">
+      <div class="dua-arabic">لَّآ إِلَـٰهَ إِلَّآ أَنتَ سُبْحَـٰنَكَ إِنِّى كُنتُ مِنَ ٱلظَّـٰلِمِينَ</div>
+      <div class="dua-phonetic" style="margin-top:.4rem">Laa ilaaha illa anta — subhaanaka — inni kuntu minaz-zaalimeen</div>
+      <div class="dua-label" style="margin-top:.3rem">JONAH'S DU'A — SAY IT IN YOUR DARKNESS</div>
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,.5);font-style:italic;margin-bottom:1rem">May Allah rescue you from every darkness, little one. 🌊</div>
+    <button class="restart-btn" onclick="goTo(0)">🔄 Read the story again!</button>
+  </div>
+</div>
+
+</div><!-- /story -->
+
+<div class="bottom-nav" id="bottomNav">
+  <button class="nav-btn" id="prevBtn" onclick="goTo(currentPage-1)" disabled>← Back</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()" title="Play / Pause">▶</button>
+    <div class="time-display" id="timeDisplay">0:00</div>
+  </div>
+  <div class="nav-dots" id="navDots"></div>
+  <button class="nav-btn nav-next" id="nextBtn" onclick="goTo(currentPage+1)">Next →</button>
+</div>
+
+<script>
+const TOTAL = 13;
+let currentPage = 0;
+let isPlaying = false;
+let choiceMade = false;
+
+// One audio file per page — named audio_yunus_1.wav to audio_yunus_13.wav
+const AUDIO_FILES = [
+  "audio_yunus_1.mp3",   // page 1  — Jonah and his people
+  "audio_yunus_2.mp3",   // page 2  — Jonah leaves
+  "audio_yunus_3.mp3",   // page 3  — The storm
+  "audio_yunus_4.mp3",   // page 4  — Choice question
+  "audio_yunus_5.mp3",   // page 5  — Three darknesses
+  "audio_yunus_6.mp3",   // page 6  — The du'a in the dark
+  "audio_yunus_7.mp3",   // page 7  — Allah answers
+  "audio_yunus_8.mp3",   // page 8  — The gourd tree
+  "audio_yunus_9.mp3",   // page 9  — His people believe
+  "audio_yunus_10.mp3",  // page 10 — Your darkness
+  "audio_yunus_11.mp3",  // page 11 — The most powerful prayer
+  "audio_yunus_12.mp3",  // page 12 — Reflection
+  "audio_yunus_13.mp3",  // page 13 — What I learned
+];
+
+const POPUP_DATA = [
+  {emoji:"🎲", title:"The Lots", text:"The sailors drew lots to find out who had brought the storm. According to Quran 37:141, the lot fell to Jonah — and they drew again and again. Each time: Jonah. He knew this was Allah's sign. He could not escape his destiny."},
+  {emoji:"📢", title:"Jonah's Call", text:"Day after day, night after night, Jonah stood before the people of Nineveh and called: \"Come back to Allah! He is the only One. He made you. He loves you.\" But they laughed and walked away. And Jonah's heart grew heavy."}
+];
+
+// Page 5 — tap each darkness to reveal it
+function revealDarkness(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle("lit");
+}
+
+// Page 6 — tap du'a words to highlight their meaning
+function tapDuaWord(el, meaning) {
+  el.classList.toggle("tapped");
+  el.title = meaning;
+  // show a small tooltip-style popup
+  popup_inline(meaning);
+}
+
+function popup_inline(text) {
+  // reuse the popup system briefly
+  document.getElementById("popup-emoji").textContent = "✨";
+  document.getElementById("popup-title").textContent = "What it means";
+  document.getElementById("popup-text").textContent = text;
+  document.getElementById("popup").classList.add("open");
+}
+
+// Page 8 — tap mercy items to reveal details + show SVG element
+function revealMercy(el, svgId) {
+  el.classList.toggle("revealed");
+  if (svgId) {
+    var svgEl = document.getElementById(svgId);
+    if (svgEl) svgEl.style.opacity = el.classList.contains("revealed") ? "1" : "0";
+  }
+}
+
+// Page 11 — tap each dua part to highlight
+function tapDuaPart(el) {
+  el.classList.toggle("tapped");
+}
+
+const CHOICE_DATA = [
+  {emoji:"😨", text:"Yes — the darkness and silence must have been terrifying. But Jonah was a prophet, and even prophets feel fear. What matters is what he did with that fear — he turned it into prayer."},
+  {emoji:"😔", text:"Exactly. Jonah knew he had made a mistake by leaving without permission. That honesty — saying 'I was wrong' — was the beginning of his rescue. Allah loves the one who comes back."},
+  {emoji:"🙏", text:"Yes! Even in the deepest darkness, Jonah's heart remembered Allah. That is the wisdom Ibn ʿArabī saw in him — the soul that breathes Allah's name even when it cannot see the light."}
+];
+
+const audio = document.getElementById("storyAudio");
+
+function loadPageAudio(pageIndex) {
+  audio.src = AUDIO_FILES[pageIndex];
+  audio.load();
+}
+
+audio.addEventListener("error", function() {
+  var btn = document.getElementById("playBtn");
+  if (btn) { btn.textContent = "✕"; btn.style.background = "rgba(255,60,60,.4)"; }
+});
+audio.addEventListener("play",  function() { isPlaying = true;  updatePlayBtn(); });
+audio.addEventListener("pause", function() { isPlaying = false; updatePlayBtn(); });
+
+function updatePlayBtn() {
+  var btn = document.getElementById("playBtn");
+  if (!btn) return;
+  btn.textContent = isPlaying ? "⏸" : "▶";
+  btn.classList.toggle("playing", isPlaying);
+}
+
+function togglePlay() {
+  if (isPlaying) { audio.pause(); } else { audio.play(); }
+}
+
+// Auto-advance to next page when audio ends
+audio.addEventListener("ended", function() {
+  isPlaying = false;
+  updatePlayBtn();
+  var td = document.getElementById("timeDisplay");
+  if (td) td.textContent = "0:00";
+  if (currentPage < TOTAL - 1) {
+    goTo(currentPage + 1);
+  }
+});
+
+audio.addEventListener("timeupdate", function() {
+  var t = audio.currentTime;
+  var m = Math.floor(t / 60);
+  var s = Math.floor(t % 60).toString().padStart(2, "0");
+  var td = document.getElementById("timeDisplay");
+  if (td) td.textContent = m + ":" + s;
+});
+
+function makeStars() {
+  var sf = document.getElementById("stars");
+  for (var i = 0; i < 80; i++) {
+    var d = document.createElement("div");
+    var sz = Math.random() * 2.5 + 0.5;
+    d.className = "star";
+    d.style.width = sz + "px";
+    d.style.height = sz + "px";
+    d.style.left = (Math.random() * 100) + "%";
+    d.style.top = (Math.random() * 60) + "%";
+    d.style.animationDelay = (Math.random() * 3) + "s";
+    d.style.animationDuration = (2 + Math.random() * 3) + "s";
+    sf.appendChild(d);
+  }
+}
+
+function buildDots() {
+  var c = document.getElementById("navDots");
+  c.innerHTML = "";
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement("div");
+    d.className = "nav-dot";
+    d.id = "dot" + i;
+    c.appendChild(d);
+  }
+}
+
+function startStory() {
+  document.getElementById("cover").style.display = "none";
+  document.getElementById("story").style.display = "block";
+  document.getElementById("bottomNav").classList.add("visible");
+  buildDots();
+  goTo(0);
+}
+
+function showScene(n) {
+  document.querySelectorAll(".scene").forEach(function(s) { s.classList.remove("active"); });
+  document.getElementById("s" + n).classList.add("active");
+  document.querySelectorAll(".nav-dot").forEach(function(d, i) {
+    d.classList.toggle("active", i === n);
+  });
+  document.getElementById("prevBtn").disabled = (n === 0);
+  var nb = document.getElementById("nextBtn");
+  nb.disabled = (n === TOTAL - 1);
+  nb.textContent = n === TOTAL - 1 ? "Done ✓" : "Next →";
+  var pct = ((n + 1) / TOTAL) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("pageCounter").textContent = (n + 1) + " / " + TOTAL;
+  window.scrollTo({top: 0, behavior: "instant"});
+}
+
+function resetChoicePage() {
+  choiceMade = false;
+  document.querySelectorAll(".choice-btn").forEach(function(b) { b.disabled = false; });
+  var resp = document.getElementById("choiceResp");
+  if (resp) resp.classList.remove("open");
+}
+
+function goTo(n) {
+  if (n < 0 || n >= TOTAL) return;
+  if (currentPage === 3 && n !== 3) resetChoicePage();
+  if (n === 3) resetChoicePage();
+  // Reset page 8 mercy items when leaving page 8
+  if (currentPage === 7 && n !== 7) {
+    ["p8-vine","p8-goat","p8-fruits"].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.style.opacity = "0";
+    });
+    document.querySelectorAll(".mercy-item").forEach(function(el){ el.classList.remove("revealed"); });
+  }
+  currentPage = n;
+  showScene(n);
+  audio.pause();
+  audio.src = "";
+  loadPageAudio(n);
+  audio.play().catch(function(){});
+}
+
+function chooseAnswer(i) {
+  // Stop audio immediately
+  audio.pause();
+  var d = CHOICE_DATA[i];
+  document.getElementById("choiceEmoji").textContent = d.emoji;
+  document.getElementById("choiceText").textContent  = d.text;
+  document.getElementById("choiceResp").classList.add("open");
+  document.querySelectorAll(".choice-btn").forEach(function(b) { b.disabled = true; });
+  choiceMade = true;
+  // Resume page 4 audio from 0:21 (the "You know what?" continuation)
+  audio.currentTime = 22;
+  audio.play().catch(function(){});
+}
+
+function popup(i) {
+  var d = POPUP_DATA[i];
+  document.getElementById("popup-emoji").textContent = d.emoji;
+  document.getElementById("popup-title").textContent = d.title;
+  document.getElementById("popup-text").textContent  = d.text;
+  document.getElementById("popup").classList.add("open");
+}
+
+function closePopup() {
+  document.getElementById("popup").classList.remove("open");
+}
+
+makeStars();
+</script>
+</body>
+</html>
