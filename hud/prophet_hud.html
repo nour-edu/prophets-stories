@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prophet Hud — The Wind of Truth 🏜️</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#f9ca24;--warm:#f39c12;--cream:#fef9e7;
+  --sand1:#8B5E3C;--sand2:#C4884A;--sand3:#E8B87A;
+  --storm:#4A5568;--sky-day:#74b9ff;
+  --desert-bg:#1a0f05;--NAV:72px
+}
+body{font-family:'Nunito',sans-serif;background:var(--desert-bg);color:#2C2C2A;overflow-x:hidden}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle 3s infinite}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+#cover{position:fixed;inset:0;z-index:100;
+  background:linear-gradient(180deg,#0d0600,#1a0f05 40%,#3d1f08 80%,#6b3a10);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem}
+.cover-icon{font-size:80px;animation:float 3s ease-in-out infinite;margin-bottom:1rem}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.cover-title{font-family:'Baloo 2',cursive;font-size:clamp(2rem,8vw,3.5rem);font-weight:800;color:var(--gold);margin-bottom:.5rem}
+.cover-sub{font-size:clamp(1rem,4vw,1.4rem);color:var(--cream);margin-bottom:.5rem;opacity:.9}
+.cover-verse{font-size:.95rem;color:rgba(255,255,255,.6);font-style:italic;margin-bottom:2.5rem;max-width:360px;line-height:1.6}
+.start-btn{background:linear-gradient(135deg,var(--gold),var(--warm));border:none;border-radius:50px;padding:16px 48px;font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:700;color:#2C2C2A;cursor:pointer;box-shadow:0 6px 30px rgba(249,202,36,.4);transition:transform .2s}
+.start-btn:hover{transform:scale(1.05)}
+#story{display:none;position:relative;z-index:1}
+.progress-wrap{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(13,6,0,.9);backdrop-filter:blur(8px);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--warm));border-radius:3px;transition:width .5s}
+.page-counter{font-family:'Baloo 2',cursive;font-size:.85rem;color:rgba(255,255,255,.6);white-space:nowrap}
+.scene{display:none;min-height:calc(100vh - var(--NAV));padding:70px 20px var(--NAV);flex-direction:column;align-items:center}
+.scene.active{display:flex}
+.visual{width:100%;max-width:580px;border-radius:20px;overflow:hidden;margin-bottom:1.2rem;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.visual svg{display:block;width:100%}
+.text-card{background:rgba(255,255,255,.97);border-radius:20px;padding:1.4rem 1.6rem;max-width:580px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3);margin-bottom:.8rem}
+.scene-title{font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;color:#6b3a10;margin-bottom:.5rem}
+.scene-text{font-size:1.05rem;line-height:1.75;color:#2C2C2A}
+.scene-text strong{color:#6b3a10}
+.ibn-arabi{margin-top:.9rem;padding:.7rem 1rem;background:linear-gradient(135deg,#fef9e7,#fdebd0);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;font-size:.9rem;color:#7d6608;font-style:italic;line-height:1.6}
+.ibn-arabi::before{content:'✨ ';font-style:normal}
+.tap-hint{font-size:.85rem;color:rgba(255,255,255,.55);text-align:center;margin-bottom:.6rem;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.popup-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px}
+.popup-overlay.open{display:flex}
+.popup-box{background:white;border-radius:24px;padding:2rem;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.popup-emoji{font-size:56px;margin-bottom:.8rem}
+.popup-title{font-family:'Baloo 2',cursive;font-size:1.3rem;color:#6b3a10;margin-bottom:.5rem}
+.popup-text{font-size:1rem;line-height:1.6;color:#2C2C2A;margin-bottom:1.2rem}
+.popup-close{background:linear-gradient(135deg,#6b3a10,#3d1f08);color:white;border:none;border-radius:50px;padding:10px 32px;font-family:'Baloo 2',cursive;font-size:1rem;cursor:pointer}
+.choice-q{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:700;color:var(--cream);text-align:center;margin-bottom:1.2rem;max-width:520px;line-height:1.4}
+.choice-btn{display:block;width:100%;max-width:520px;margin-bottom:10px;padding:13px 18px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);border-radius:14px;color:white;font-size:1rem;font-weight:600;cursor:pointer;text-align:left;transition:all .2s}
+.choice-btn:hover{background:rgba(255,255,255,.22);border-color:var(--gold)}
+.choice-response{background:rgba(255,255,255,.97);border-radius:20px;padding:1.5rem;max-width:520px;width:100%;text-align:center;display:none;margin-top:1rem}
+.choice-response.open{display:block}
+.choice-response p{font-size:1rem;line-height:1.7;color:#2C2C2A;margin-bottom:1rem}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--NAV);background:rgba(13,6,0,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(249,202,36,.2);display:none;align-items:center;justify-content:space-between;padding:0 20px;gap:12px;z-index:50}
+.bottom-nav.visible{display:flex}
+.nav-btn{min-width:90px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:50px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.2)}
+.nav-btn:disabled{opacity:.25;cursor:default}
+.nav-next{background:linear-gradient(135deg,var(--gold),var(--warm));color:#2C2C2A;border:none}
+.nav-next:hover{transform:scale(1.04)}
+.nav-dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:200px}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .3s}
+.nav-dot.active{background:var(--gold);width:14px;border-radius:3px}
+.play-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6b3a10,#3d1f08);border:1.5px solid rgba(249,202,36,.4);color:white;font-size:18px;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.play-btn:hover{transform:scale(1.1)}
+.play-btn.playing{background:linear-gradient(135deg,#3d1f08,#1a0f05)}
+.time-display{font-family:'Baloo 2',cursive;font-size:.8rem;color:rgba(255,255,255,.55);min-width:28px;text-align:center}
+.tappable{cursor:pointer;transition:filter .2s}
+.tappable:hover{filter:brightness(1.4) drop-shadow(0 0 10px rgba(249,202,36,.8))}
+.ending-title{font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;color:var(--gold);text-align:center;margin-bottom:.4rem}
+.reflection-box{background:rgba(255,255,255,.1);border:2px solid rgba(249,202,36,.4);border-radius:20px;padding:1.4rem;max-width:480px;width:100%;text-align:center;margin-bottom:1rem}
+.reflection-q{font-family:'Baloo 2',cursive;font-size:1.1rem;color:var(--gold);margin-bottom:.8rem}
+.lesson-card{background:rgba(255,255,255,.1);border:1.5px solid rgba(249,202,36,.35);border-radius:14px;padding:.9rem 1rem;display:flex;align-items:center;gap:12px;margin-bottom:8px;max-width:480px;width:100%;text-align:left}
+.lesson-icon{font-size:26px;flex-shrink:0}
+.lesson-title{font-family:'Baloo 2',cursive;font-size:.95rem;color:var(--gold);margin-bottom:1px}
+.lesson-body{font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.5}
+.restart-btn{background:linear-gradient(135deg,var(--gold),var(--warm));border:none;border-radius:50px;padding:14px 40px;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:700;color:#2C2C2A;cursor:pointer;margin-top:.5rem}
+.sand-card{background:rgba(255,245,220,.97);border-radius:16px;padding:1.2rem 1.4rem;max-width:520px;width:100%;margin-bottom:.7rem;border-left:4px solid var(--warm)}
+.sand-card p{font-size:13px;line-height:1.75;color:#3d2008;margin-bottom:.5rem}
+.sand-card strong{color:#6b3a10}
+.thought-box{background:rgba(139,94,60,.2);border:1.5px solid rgba(249,202,36,.3);border-radius:16px;padding:.9rem 1.1rem;max-width:520px;width:100%;font-size:12.5px;color:var(--cream);line-height:1.7;font-style:italic;margin-bottom:.7rem}
+.sun-pulse{animation:sunpulse 3s ease-in-out infinite}
+@keyframes sunpulse{0%,100%{opacity:.15}50%{opacity:.35}}
+.cloud-drift{animation:cdrift 8s ease-in-out infinite}
+@keyframes cdrift{0%,100%{transform:translateX(0)}50%{transform:translateX(12px)}}
+.wind-blow{animation:windblow 2s ease-in-out infinite}
+@keyframes windblow{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}
+.sand-swirl{animation:sandswirl 3s ease-in-out infinite}
+@keyframes sandswirl{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+.tower-shake{animation:towershake .3s ease-in-out infinite}
+@keyframes towershake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.palm-sway{animation:palmsway 2.5s ease-in-out infinite}
+@keyframes palmsway{0%,100%{transform:rotate(0)}50%{transform:rotate(4deg)}}
+.glow-pulse{animation:glowpulse 2s ease-in-out infinite}
+@keyframes glowpulse{0%,100%{opacity:.4}50%{opacity:1}}
+.lightning{animation:flash 4s ease-in-out infinite}
+@keyframes flash{0%,75%,100%{opacity:0}77%,79%{opacity:1}78%,80%{opacity:0}81%{opacity:.7}82%{opacity:0}}
+@media(max-width:420px){.scene{padding:65px 12px var(--NAV)}.text-card{padding:1rem 1.1rem}.scene-title{font-size:1.2rem}.scene-text{font-size:.95rem}}
+@media(hover:none){.nav-btn{min-height:44px}.tappable{-webkit-tap-highlight-color:rgba(249,202,36,.3)}}
+</style>
+</head>
+<body>
+<audio id="storyAudio" preload="auto"></audio>
+<div class="stars" id="stars"></div>
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <div class="popup-emoji" id="popup-emoji"></div>
+    <div class="popup-title" id="popup-title"></div>
+    <div class="popup-text" id="popup-text"></div>
+    <button class="popup-close" onclick="closePopup()">Close ✨</button>
+  </div>
+</div>
+<div id="cover">
+  <div class="cover-icon">🌪️</div>
+  <div class="cover-title">Prophet Hud</div>
+  <div class="cover-sub">The Wind That Tells the Truth 🏜️</div>
+  <div class="cover-verse">"I place my trust in Allah — my Lord and your Lord. There is no living creature that is not completely under His control." — Quran 11:56</div>
+  <button class="start-btn" onclick="startStory()">Begin the Story ✨</button>
+</div>
+<div id="story">
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="page-counter" id="pageCounter">1 / 13</span>
+  </div>
+
+<!-- PAGE 1: The Mighty People of Aad -->
+<div class="scene" id="s0">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g0sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a90d9"/><stop offset="60%" stop-color="#87ceeb"/><stop offset="100%" stop-color="#c4884a"/></linearGradient>
+          <linearGradient id="g0sand" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c4884a"/><stop offset="100%" stop-color="#8b5e3c"/></linearGradient>
+        </defs>
+        <rect width="480" height="280" fill="url(#g0sky)"/>
+        <circle cx="60" cy="50" r="38" fill="#FFD54F" opacity=".9"/>
+        <circle cx="60" cy="50" r="55" fill="#FFD54F" opacity=".12" class="sun-pulse"/>
+        <path d="M0,210 Q120,195 240,210 Q360,225 480,210 L480,280 L0,280Z" fill="url(#g0sand)"/>
+        <!-- Tower 1 -->
+        <rect x="55"  y="100" width="55" height="115" rx="4" fill="#8B5E3C"/>
+        <rect x="60"  y="95"  width="45" height="12"  rx="3" fill="#A0704A"/>
+        <rect x="65"  y="83"  width="35" height="15"  rx="3" fill="#8B5E3C"/>
+        <rect x="71"  y="72"  width="23" height="14"  rx="2" fill="#A0704A"/>
+        <rect x="67"  y="115" width="10" height="14" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="85"  y="115" width="10" height="14" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="67"  y="145" width="10" height="14" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="85"  y="145" width="10" height="14" rx="2" fill="#3d1f08" opacity=".6"/>
+        <!-- Tower 2 -->
+        <rect x="148" y="80"  width="68" height="135" rx="4" fill="#C4884A"/>
+        <rect x="153" y="74"  width="58" height="12"  rx="3" fill="#D49A5A"/>
+        <rect x="160" y="60"  width="44" height="17"  rx="3" fill="#C4884A"/>
+        <rect x="167" y="47"  width="30" height="16"  rx="2" fill="#D49A5A"/>
+        <rect x="158" y="100" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="178" y="100" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="158" y="135" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="178" y="135" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="158" y="168" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="178" y="168" width="12" height="16" rx="2" fill="#3d1f08" opacity=".6"/>
+        <!-- Tower 3 tallest -->
+        <rect x="263" y="60"  width="78" height="155" rx="4" fill="#8B5E3C"/>
+        <rect x="268" y="53"  width="68" height="12"  rx="3" fill="#A0704A"/>
+        <rect x="276" y="39"  width="52" height="17"  rx="3" fill="#8B5E3C"/>
+        <rect x="285" y="23"  width="34" height="19"  rx="2" fill="#A0704A"/>
+        <rect x="294" y="8"   width="16" height="18"  rx="2" fill="#8B5E3C"/>
+        <rect x="274" y="80"  width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="298" y="80"  width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="274" y="118" width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="298" y="118" width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="274" y="156" width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="298" y="156" width="13" height="18" rx="2" fill="#3d1f08" opacity=".6"/>
+        <!-- Tower 4 -->
+        <rect x="385" y="92"  width="62" height="123" rx="4" fill="#C4884A"/>
+        <rect x="390" y="85"  width="52" height="12"  rx="3" fill="#D49A5A"/>
+        <rect x="397" y="72"  width="38" height="16"  rx="3" fill="#C4884A"/>
+        <rect x="403" y="59"  width="26" height="16"  rx="2" fill="#D49A5A"/>
+        <rect x="393" y="108" width="12" height="15" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="413" y="108" width="12" height="15" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="393" y="140" width="12" height="15" rx="2" fill="#3d1f08" opacity=".6"/>
+        <rect x="413" y="140" width="12" height="15" rx="2" fill="#3d1f08" opacity=".6"/>
+        <!-- TAPPABLE MAN — large, clear, centre-bottom -->
+        <g class="tappable" onclick="popup(0)" style="cursor:pointer">
+          <!-- Glow hint to invite tap -->
+          <circle cx="232" cy="192" r="32" fill="rgba(249,202,36,.08)" class="glow-pulse"/>
+          <!-- Body — big tall man -->
+          <circle cx="232" cy="168" r="18" fill="#D4A070"/>
+          <ellipse cx="232" cy="153" rx="18" ry="11" fill="#5D3A1A"/>
+          <rect x="215" y="185" width="34" height="50" rx="10" fill="#8B4020"/>
+          <!-- Arms wide open — powerful stance -->
+          <line x1="215" y1="198" x2="188" y2="184" stroke="#8B4020" stroke-width="10" stroke-linecap="round"/>
+          <line x1="249" y1="198" x2="276" y2="184" stroke="#8B4020" stroke-width="10" stroke-linecap="round"/>
+          <!-- Legs -->
+          <line x1="224" y1="233" x2="218" y2="258" stroke="#8B4020" stroke-width="10" stroke-linecap="round"/>
+          <line x1="240" y1="233" x2="246" y2="258" stroke="#8B4020" stroke-width="10" stroke-linecap="round"/>
+          <!-- Tap label -->
+          <rect x="182" y="132" width="100" height="22" rx="10" fill="rgba(249,202,36,.2)"/>
+          <text x="232" y="147" text-anchor="middle" font-size="11" fill="#f9ca24" font-family="'Baloo 2',cursive" font-weight="700">👆 Tap me!</text>
+        </g>
+        <!-- Palm trees -->
+        <rect x="360" y="175" width="7" height="45" rx="3" fill="#5D3A1A" class="palm-sway"/>
+        <ellipse cx="363" cy="172" rx="22" ry="14" fill="#27ae60" class="palm-sway"/>
+        <ellipse cx="348" cy="178" rx="16" ry="9"  fill="#2ecc71" class="palm-sway"/>
+        <!-- Sand dunes -->
+        <ellipse cx="120" cy="240" rx="100" ry="30" fill="#C4884A" opacity=".6"/>
+        <ellipse cx="380" cy="250" rx="80"  ry="22" fill="#C4884A" opacity=".5"/>
+      </svg></div>
+  <p class="tap-hint">🏛️ Tap the man to discover how big the Aad were!</p>
+  <div class="text-card">
+    <div class="scene-title">🏛️ The Mighty People of Aad</div>
+    <div class="scene-text">After Prophet Noah, Allah blessed his descendants and they spread across the earth. One great nation was called <strong>the Aad</strong>.<br><br>They were the superpower of their time — <strong>enormous in height, extraordinary in strength</strong>, rulers of a vast land of green gardens and towering stone cities.<br><br>The Quran says: <em>"Have you not seen what your Lord did with Aad — with Iram of the lofty pillars, the likes of whom had never been created in the land?"</em> (Quran 89:6-8)<br><br>They had everything. And they knew it.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: Hud teaches us something beautiful — that you learn about Allah not just by reading about Him, but by <strong>walking with Him every day</strong>. Every step you take when things are hard, every time you stay honest even when it is difficult — that is how your heart gets closer to Allah.</div>
+  </div>
+</div>
+
+
+<!-- PAGE 2: Their Arrogance — Building for Pride -->
+<div class="scene" id="s1">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1bsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e07b39"/><stop offset="100%" stop-color="#c4884a"/></linearGradient>
+        </defs>
+        <rect width="480" height="280" fill="url(#g1bsky)"/>
+        <circle cx="420" cy="55" r="45" fill="#FF6B00" opacity=".9"/>
+        <circle cx="420" cy="55" r="65" fill="#FF6B00" opacity=".12" class="sun-pulse"/>
+        <rect x="0" y="225" width="480" height="55" fill="#8B5E3C"/>
+        <path d="M0,218 Q80,208 160,218 Q240,228 320,218 Q400,208 480,218 L480,225 L0,225Z" fill="#A0704A"/>
+        <!-- IDOL centre -->
+        <rect x="200" y="128" width="80" height="97" rx="5" fill="#6B4020"/>
+        <rect x="208" y="118" width="64" height="16" rx="4" fill="#8B5E3C"/>
+        <ellipse cx="240" cy="116" rx="28" ry="18" fill="#6B4020"/>
+        <ellipse cx="240" cy="106" rx="20" ry="14" fill="#8B5E3C"/>
+        <ellipse cx="231" cy="103" rx="5" ry="6" fill="#3d1f08"/>
+        <ellipse cx="249" cy="103" rx="5" ry="6" fill="#3d1f08"/>
+        <path d="M229,114 Q240,122 251,114" stroke="#3d1f08" stroke-width="2.5" fill="none"/>
+        <!-- Torches -->
+        <rect x="155" y="170" width="12" height="55" rx="3" fill="#5D3A1A"/>
+        <path d="M161,168 Q156,155 161,144 Q166,155 161,168Z" fill="#FF6000" opacity=".9"><animate attributeName="d" values="M161,168 Q156,155 161,144 Q166,155 161,168Z;M161,168 Q153,153 160,142 Q169,153 161,168Z" dur=".7s" repeatCount="indefinite"/></path>
+        <rect x="313" y="170" width="12" height="55" rx="3" fill="#5D3A1A"/>
+        <path d="M319,168 Q314,155 319,144 Q324,155 319,168Z" fill="#FF6000" opacity=".9"><animate attributeName="d" values="M319,168 Q314,155 319,144 Q324,155 319,168Z;M319,168 Q311,153 318,142 Q326,153 319,168Z" dur=".8s" repeatCount="indefinite" begin=".2s"/></path>
+
+        <!-- ═══ SUJUD FIGURES — front-facing kneeling silhouette ═══
+             Shape: two knees flat on ground (wide ellipse), back arcs up in dome,
+             head small circle tucked down at front. Like the prayer icon. -->
+
+        <!-- Person 1 — left -->
+        <g class="tappable" onclick="popup(1)" style="cursor:pointer">
+          <!-- Knees/legs flat on ground — wide flat ellipse -->
+          <ellipse cx="68" cy="228" rx="28" ry="9" fill="#8B4020"/>
+          <!-- Curved back rising up from knees — dome arc -->
+          <path d="M44,225 Q48,196 68,188 Q88,196 92,225" fill="#8B4020"/>
+          <!-- Head tucked down at front -->
+          <circle cx="68" cy="228" r="10" fill="#D4A070"/>
+          <!-- Forehead touching ground line -->
+          <ellipse cx="68" cy="235" rx="8" ry="3" fill="#C4884A"/>
+
+          <!-- Person 2 beside -->
+          <ellipse cx="128" cy="228" rx="28" ry="9" fill="#703010"/>
+          <path d="M104,225 Q108,196 128,188 Q148,196 152,225" fill="#703010"/>
+          <circle cx="128" cy="228" r="10" fill="#C89060"/>
+          <ellipse cx="128" cy="235" rx="8" ry="3" fill="#C4884A"/>
+        </g>
+
+        <!-- Person 3 — right -->
+        <ellipse cx="348" cy="228" rx="28" ry="9" fill="#8B4020"/>
+        <path d="M324,225 Q328,196 348,188 Q368,196 372,225" fill="#8B4020"/>
+        <circle cx="348" cy="228" r="10" fill="#D4A070"/>
+        <ellipse cx="348" cy="235" rx="8" ry="3" fill="#C4884A"/>
+
+        <!-- Person 4 — far right -->
+        <ellipse cx="412" cy="228" rx="28" ry="9" fill="#703010"/>
+        <path d="M388,225 Q392,196 412,188 Q432,196 436,225" fill="#703010"/>
+        <circle cx="412" cy="228" r="10" fill="#C89060"/>
+        <ellipse cx="412" cy="235" rx="8" ry="3" fill="#C4884A"/>
+
+        <!-- PROUD CHIEF — standing, NOT bowing -->
+        <circle cx="240" cy="186" r="14" fill="#D4A070"/>
+        <ellipse cx="240" cy="173" rx="14" ry="9" fill="#3d1f08"/>
+        <rect x="226" y="199" width="28" height="26" rx="7" fill="#8B0000"/>
+        <line x1="226" y1="208" x2="208" y2="202" stroke="#8B0000" stroke-width="7" stroke-linecap="round"/>
+        <line x1="254" y1="208" x2="272" y2="202" stroke="#8B0000" stroke-width="7" stroke-linecap="round"/>
+        <line x1="232" y1="224" x2="228" y2="248" stroke="#8B0000" stroke-width="8" stroke-linecap="round"/>
+        <line x1="248" y1="224" x2="252" y2="248" stroke="#8B0000" stroke-width="8" stroke-linecap="round"/>
+        <rect x="255" y="155" width="170" height="26" rx="12" fill="rgba(255,255,255,.85)"/>
+        <text x="340" y="172" text-anchor="middle" font-size="10.5" fill="#8B0000" font-family="'Nunito',sans-serif" font-weight="600">Who is greater than us?!</text>
+        <!-- STONE IDOL label — top left of idol, with pointer line -->
+        <line x1="197" y1="138" x2="175" y2="115" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <rect x="90" y="100" width="82" height="20" rx="9" fill="rgba(0,0,0,.55)"/>
+        <text x="131" y="114" text-anchor="middle" font-size="10" fill="white" font-family="'Nunito',sans-serif" font-weight="700">🪨 Stone idol</text>
+        <!-- BOWING PEOPLE label — above left group, with pointer line -->
+        <line x1="68" y1="218" x2="55" y2="175" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <rect x="5" y="155" width="100" height="20" rx="9" fill="rgba(0,0,0,.55)"/>
+        <text x="55" y="169" text-anchor="middle" font-size="10" fill="white" font-family="'Nunito',sans-serif" font-weight="700">🙇 Bowing people</text>
+        <ellipse cx="240" cy="242" rx="200" ry="18" fill="#C4884A" opacity=".4" class="sand-swirl"/>
+      </svg></div>
+  <p class="tap-hint">👆 Tap the bowing people to discover their sin!</p>
+  <div class="text-card">
+    <div class="scene-title">😤 Pride and Forgetting</div>
+    <div class="scene-text">The Aad had everything — strength, wealth, gardens, palaces.<br><br>But their power made them proud. They built their towering monuments not to thank Allah — but to show off. <em>"Who is greater than us in strength?"</em> they boasted. (Quran 41:15)<br><br>They knew Allah existed. But they chose to worship idols alongside Him — <strong>gods made of stone they carved with their own hands</strong>.<br><br>And they began to oppress the weak. Justice disappeared. Arrogance ruled.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: when someone is very proud — thinking only about how strong they are, how big their house is, how great they are — their heart gets too full of <em>themselves</em> to have room for Allah. The Aad's hearts were so full of pride, there was no space left for love of Allah.</div>
+  </div>
+</div>
+<!-- PAGE 3: Hud Calls His People -->
+<div class="scene" id="s2">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g2sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb"/><stop offset="100%" stop-color="#c4884a"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g2sky)"/>
+    <circle cx="420" cy="50" r="36" fill="#FFD54F" opacity=".85"/>
+    <circle cx="420" cy="50" r="52" fill="#FFD54F" opacity=".12" class="sun-pulse"/>
+    <!-- Desert floor -->
+    <rect x="0" y="228" width="480" height="52" fill="#8B5E3C"/>
+    <path d="M0,222 Q100,212 200,222 Q300,232 400,222 L480,218 L480,228 L0,228Z" fill="#A0704A"/>
+    <!-- Stone towers background -->
+    <rect x="20"  y="130" width="40" height="100" rx="3" fill="#6B4020" opacity=".6"/>
+    <rect x="420" y="110" width="50" height="120" rx="3" fill="#8B5E3C" opacity=".6"/>
+    <!-- Hud standing on rock elevated — calling -->
+    <ellipse cx="240" cy="228" rx="45" ry="14" fill="#6B4020"/>
+    <rect x="218" y="210" width="44" height="20" rx="6" fill="#8B5E3C"/>
+    <!-- Hud figure — tall, noble -->
+    <circle cx="240" cy="182" r="16" fill="#E8956A"/>
+    <ellipse cx="240" cy="168" rx="16" ry="10" fill="#5D3A1A"/>
+    <rect x="224" y="197" width="32" height="46" rx="9" fill="#2E86AB"/>
+    <!-- Arms wide open — calling his people -->
+    <ellipse cx="200" cy="208" rx="22" ry="7" fill="#E8956A" transform="rotate(-20,200,208)"/>
+    <ellipse cx="280" cy="208" rx="22" ry="7" fill="#E8956A" transform="rotate(20,280,208)"/>
+    <!-- Light rays emanating from Hud -->
+    <line x1="240" y1="178" x2="240" y2="155" stroke="rgba(249,202,36,.4)" stroke-width="2" stroke-dasharray="4 3"/>
+    <line x1="240" y1="178" x2="215" y2="158" stroke="rgba(249,202,36,.3)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <line x1="240" y1="178" x2="265" y2="158" stroke="rgba(249,202,36,.3)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <!-- People listening left — some attentive, some turning away -->
+    <circle cx="60"  cy="210" r="12" fill="#D4A070"/>
+    <rect x="49" y="221" width="22" height="30" rx="6" fill="#8B4020"/>
+    <!-- Hand to ear listening -->
+    <circle cx="49" cy="209" r="4" fill="#C89060" opacity=".8"/>
+    <circle cx="115" cy="208" r="13" fill="#C89060"/>
+    <rect x="103" y="220" width="24" height="32" rx="6" fill="#703010"/>
+    <!-- People right — turning backs -->
+    <circle cx="370" cy="210" r="12" fill="#D4A070"/>
+    <rect x="358" y="221" width="22" height="30" rx="6" fill="#8B0000"/>
+    <!-- Finger in ear -->
+    <circle cx="358" cy="208" r="4" fill="#C89060" opacity=".8"/>
+    <circle cx="420" cy="208" r="13" fill="#C89060"/>
+    <rect x="408" y="220" width="24" height="32" rx="6" fill="#703010"/>
+    <!-- Speech bubble from Hud -->
+    <rect x="130" y="138" width="220" height="32" rx="14" fill="rgba(255,255,255,.9)"/>
+    <text x="240" y="158" text-anchor="middle" font-size="11.5" fill="#1a0f05" font-family="'Nunito',sans-serif" font-weight="700">O my people! Worship Allah alone!</text>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🗣️ Hud Calls His People</div>
+    <div class="scene-text">So Allah sent a prophet from among the Aad themselves — their own brother, their own family.<br><br>His name was <strong>Hud</strong>.<br><br>He stood among them and called: <em>"O my people! Worship Allah — you have no god other than Him. Will you not then fear Him?"</em> (Quran 7:65)<br><br>He asked nothing in return: <em>"I do not ask you for any reward. My reward is only from the One who created me."</em> (Quran 11:51)<br><br>He was one of them. He loved them. And he called them, day after day.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: Hud shows us that doing good — even when it is really, really hard — brings you closer to Allah. You don't have to be perfect. You just have to keep going, one day at a time.</div>
+  </div>
+</div>
+
+<!-- PAGE 4: They Mock Him — Years Pass -->
+<div class="scene" id="s3">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g3sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4863a"/><stop offset="100%" stop-color="#8b5e3c"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g3sky)"/>
+    <!-- Desert floor cracked -->
+    <rect x="0" y="235" width="480" height="45" fill="#6B4020"/>
+    <line x1="80" y1="240" x2="120" y2="255" stroke="#4a2808" stroke-width="1.5" opacity=".6"/>
+    <line x1="200" y1="238" x2="240" y2="250" stroke="#4a2808" stroke-width="1.5" opacity=".6"/>
+    <line x1="340" y1="242" x2="380" y2="252" stroke="#4a2808" stroke-width="1.5" opacity=".6"/>
+    <!-- Hud — still calling, alone now, but standing firm -->
+    <circle cx="240" cy="190" r="14" fill="#E8956A"/>
+    <ellipse cx="240" cy="177" rx="14" ry="9" fill="#5D3A1A"/>
+    <rect x="226" y="203" width="28" height="40" rx="8" fill="#2E86AB"/>
+    <line x1="226" y1="212" x2="208" y2="203" stroke="#2E86AB" stroke-width="6" stroke-linecap="round"/>
+    <line x1="254" y1="212" x2="272" y2="203" stroke="#2E86AB" stroke-width="6" stroke-linecap="round"/>
+    <!-- Crowd mocking — laughing figures -->
+    <g class="tappable" onclick="popup(2)">
+      <circle cx="75"  cy="202" r="13" fill="#D4A070"/>
+      <ellipse cx="75"  cy="189" rx="13" ry="8" fill="#3d1f08"/>
+      <rect x="63"  y="214" width="24" height="32" rx="6" fill="#8B0000"/>
+      <rect x="60" y="178" width="90" height="22" rx="10" fill="rgba(255,255,255,.8)"/>
+      <text x="105" y="193" text-anchor="middle" font-size="10" fill="#8B0000" font-family="'Nunito',sans-serif" font-weight="700">Ha ha! A fool!</text>
+      <circle cx="145" cy="200" r="12" fill="#C89060"/>
+      <ellipse cx="145" cy="188" rx="12" ry="8" fill="#5D3A1A"/>
+      <rect x="134" y="211" width="22" height="30" rx="6" fill="#703010"/>
+    </g>
+    <!-- More mockers right -->
+    <circle cx="370" cy="200" r="13" fill="#D4A070"/>
+    <rect x="358" y="212" width="24" height="32" rx="6" fill="#8B0000"/>
+    <rect x="310" y="178" width="120" height="22" rx="10" fill="rgba(255,255,255,.8)"/>
+    <text x="370" y="193" text-anchor="middle" font-size="10" fill="#8B0000" font-family="'Nunito',sans-serif" font-weight="700">We see you as a fool!</text>
+    <circle cx="430" cy="202" r="12" fill="#C89060"/>
+    <rect x="418" y="213" width="22" height="30" rx="6" fill="#703010"/>
+    <!-- Time passing — multiple suns/moons cycling overhead -->
+    <circle cx="100" cy="40" r="18" fill="#FFD54F" opacity=".5"/>
+    <circle cx="200" cy="30" r="16" fill="#FFFDE7" opacity=".4"/>
+    <circle cx="300" cy="38" r="18" fill="#FFD54F" opacity=".5"/>
+    <circle cx="400" cy="28" r="16" fill="#FFFDE7" opacity=".4"/>
+    <text x="240" y="70" text-anchor="middle" font-size="12" fill="rgba(255,255,255,.5)" font-family="'Baloo 2',cursive">Years passed... and they grew more arrogant</text>
+    <!-- Sand drifting at feet -->
+    <ellipse cx="240" cy="250" rx="180" ry="14" fill="#C4884A" opacity=".4" class="sand-swirl"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">😤 They Mocked Him — and the Years Passed</div>
+    <div class="scene-text">The chiefs of the Aad refused. They called Hud a fool and a liar:<br><br><em>"Indeed, we see you in foolishness, and indeed, we think you are of the liars."</em> (Quran 7:66)<br><br>Hud kept calling. And the years passed.<br><br>But with each passing year, the Aad grew <strong>prouder, more obstinate, more tyrannical</strong>. They mocked Hud more. They built more towers — not out of gratitude, but out of arrogance. They oppressed the weak more. They drifted further from Allah.<br><br>And still Hud called. Because a prophet never stops.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: if someone laughs at you for doing what is right — that is not a sign you are wrong. It is a sign you are doing something important. Hud kept going every single day. And that is one of the bravest things anyone can ever do.</div>
+  </div>
+</div>
+
+<!-- PAGE 5: Hud's Fearless Answer -->
+<div class="scene" id="s4">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g4sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a60"/><stop offset="100%" stop-color="#0a1a30"/></linearGradient>
+      <radialGradient id="g4glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f9ca24" stop-opacity=".3"/><stop offset="100%" stop-color="#f9ca24" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g4sky)"/>
+    <!-- Night stars -->
+    <circle cx="50"  cy="25" r="1.5" fill="white" opacity=".8"><animate attributeName="opacity" values=".3;1;.3" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="150" cy="18" r="2"   fill="#FFF9C4"><animate attributeName="opacity" values=".2;.9;.2" dur="3.5s" repeatCount="indefinite" begin=".5s"/></circle>
+    <circle cx="300" cy="30" r="1.5" fill="white" opacity=".85"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite" begin="1s"/></circle>
+    <circle cx="420" cy="15" r="2"   fill="#FFF9C4"><animate attributeName="opacity" values=".3;1;.3" dur="4s" repeatCount="indefinite" begin=".2s"/></circle>
+    <!-- Moon -->
+    <circle cx="400" cy="55" r="28" fill="#FFFDE7" opacity=".9"/>
+    <circle cx="415" cy="46" r="22" fill="#1a3a60"/>
+    <!-- Desert floor -->
+    <rect x="0" y="230" width="480" height="50" fill="#3d1f08"/>
+    <!-- Hud — standing alone, arms raised declaring trust in Allah -->
+    <circle cx="240" cy="182" r="18" fill="#E8956A"/>
+    <ellipse cx="240" cy="167" rx="18" ry="11" fill="#5D3A1A"/>
+    <rect x="222" y="199" width="36" height="48" rx="10" fill="#2E86AB"/>
+    <!-- Arms raised — closer to body, upward -->
+    <ellipse cx="220" cy="198" rx="15" ry="5" fill="#E8956A" transform="rotate(-60,220,198)"/>
+    <ellipse cx="260" cy="198" rx="15" ry="5" fill="#E8956A" transform="rotate(60,260,198)"/>
+    <!-- Golden glow around Hud -->
+    <circle cx="240" cy="192" r="55" fill="url(#g4glow)" class="glow-pulse"/>
+    <!-- Quran verse floating -->
+    <rect x="80" y="100" width="320" height="48" rx="16" fill="rgba(249,202,36,.12)"/>
+    <text x="240" y="122" text-anchor="middle" font-size="12" fill="#f9ca24" font-family="'Nunito',sans-serif" font-weight="700">"I place my trust in Allah —</text>
+    <text x="240" y="140" text-anchor="middle" font-size="12" fill="#f9ca24" font-family="'Nunito',sans-serif" font-weight="700">my Lord and your Lord."  — Quran 11:56</text>
+    <!-- Small figures of enemies in background shrinking back -->
+    <circle cx="60"  cy="222" r="10" fill="#D4A070" opacity=".7"/>
+    <rect x="51"  y="231" width="18" height="24" rx="5" fill="#8B0000" opacity=".6"/>
+    <circle cx="420" cy="220" r="10" fill="#C89060" opacity=".7"/>
+    <rect x="411" y="229" width="18" height="24" rx="5" fill="#703010" opacity=".6"/>
+    <!-- Sand at feet -->
+    <ellipse cx="240" cy="245" rx="160" ry="12" fill="#6B4020" opacity=".5"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">💪 "Do Your Worst. I Trust Allah."</div>
+    <div class="scene-text">They said the most hurtful thing — that their stone gods had made Hud go crazy. But Hud stood tall and declared something extraordinary:<br><br><em>"I call Allah to witness — and you witness too — that I reject everything you worship beside Him. So all of you plot against me, without delay!"</em> (Quran 11:54-55)<br><br>He was <strong>fearless</strong>. Not because he was strong — but because he trusted Allah completely.<br><br><em>"I place my trust in Allah — my Lord and your Lord. There is no living creature that is not completely under His control."</em> (Quran 11:56)</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: trusting Allah doesn't mean you are not scared. It means that even when you ARE scared, you remember: <em>Allah is holding me.</em> That is what Hud felt. And that feeling — that Allah is always with you — makes you braver than any army.</div>
+  </div>
+</div>
+
+<!-- PAGE 6: CHOICE -->
+<div class="scene" id="s5" style="justify-content:center;padding-top:80px">
+  <div style="font-size:60px;animation:float 2s ease-in-out infinite;margin-bottom:1.2rem">🏜️</div>
+  <div class="choice-q">Hud was called a fool by his whole people — his own family, his own tribe.<br><br>If everyone around you called you a fool for doing what is right — what would YOU do? 🤔</div>
+  <button class="choice-btn" onclick="chooseAnswer(0)">😔 It would really hurt — but I would try to keep going</button>
+  <button class="choice-btn" onclick="chooseAnswer(1)">💪 I would trust Allah and stand firm like Hud</button>
+  <button class="choice-btn" onclick="chooseAnswer(2)">🤲 I would pray and ask Allah to give me strength</button>
+  <div class="choice-response" id="choiceResp">
+    <div style="font-size:48px;margin-bottom:.8rem" id="choiceEmoji">🏜️</div>
+    <p id="choiceText"></p>
+    <button class="nav-btn nav-next" onclick="goTo(6)" style="margin-top:.5rem">Continue the story →</button>
+  </div>
+</div>
+
+<!-- PAGE 7: The Cloud — They Think it's Rain -->
+<div class="scene" id="s6">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g6sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2c3e50"/><stop offset="100%" stop-color="#8b5e3c"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g6sky)"/>
+    <!-- Dark ominous cloud approaching -->
+    <ellipse cx="350" cy="70"  rx="140" ry="55" fill="#1a2332" class="cloud-drift"/>
+    <ellipse cx="400" cy="85"  rx="100" ry="45" fill="#243040" class="cloud-drift"/>
+    <ellipse cx="290" cy="80"  rx="100" ry="42" fill="#1a2332" class="cloud-drift"/>
+    <ellipse cx="360" cy="100" rx="120" ry="50" fill="#0a1520"/>
+    <!-- Smaller clouds approaching from horizon -->
+    <ellipse cx="460" cy="55"  rx="80" ry="35" fill="#1a2332" opacity=".8" class="cloud-drift"/>
+    <!-- Desert floor -->
+    <rect x="0" y="230" width="480" height="50" fill="#6B4020"/>
+    <path d="M0,224 Q80,214 160,224 Q240,234 320,224 Q400,214 480,224 L480,230 L0,230Z" fill="#8B5E3C"/>
+    <!-- Happy people looking up — thinking it's rain -->
+    <g class="tappable" onclick="popup(3)">
+      <circle cx="80"  cy="202" r="13" fill="#D4A070"/>
+      <ellipse cx="80"  cy="190" rx="13" ry="8" fill="#5D3A1A"/>
+      <rect x="68"  y="214" width="24" height="32" rx="6" fill="#8B4020"/>
+      <!-- Arms up celebrating -->
+      <line x1="68" y1="222" x2="52"  y2="210" stroke="#8B4020" stroke-width="6" stroke-linecap="round"/>
+      <line x1="92" y1="222" x2="108" y2="210" stroke="#8B4020" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="145" cy="200" r="12" fill="#C89060"/>
+      <rect x="134" y="211" width="22" height="30" rx="6" fill="#703010"/>
+      <line x1="134" y1="218" x2="120" y2="207" stroke="#703010" stroke-width="5" stroke-linecap="round"/>
+      <line x1="156" y1="218" x2="170" y2="207" stroke="#703010" stroke-width="5" stroke-linecap="round"/>
+      <!-- Speech bubble -->
+      <rect x="48" y="160" width="145" height="28" rx="12" fill="rgba(255,255,255,.85)"/>
+      <text x="120" y="178" text-anchor="middle" font-size="10.5" fill="#1a5276" font-family="'Nunito',sans-serif" font-weight="700">A cloud! It's bringing us rain! 🎉</text>
+    </g>
+    <!-- Hud standing calm — knowing the truth -->
+    <circle cx="340" cy="202" r="14" fill="#E8956A"/>
+    <ellipse cx="340" cy="189" rx="14" ry="9" fill="#5D3A1A"/>
+    <rect x="326" y="215" width="28" height="38" rx="8" fill="#2E86AB"/>
+    <!-- Hud solemn arms folded -->
+    <line x1="326" y1="224" x2="310" y2="218" stroke="#2E86AB" stroke-width="6" stroke-linecap="round"/>
+    <line x1="354" y1="224" x2="370" y2="218" stroke="#2E86AB" stroke-width="6" stroke-linecap="round"/>
+    <!-- Lightning crack in cloud -->
+    <path d="M360,112 L348,148 L358,148 L342,185" stroke="rgba(255,230,80,.6)" stroke-width="2.5" fill="none" class="lightning"/>
+    <!-- Sand whipping up at base -->
+    <ellipse cx="180" cy="244" rx="150" ry="12" fill="#C4884A" opacity=".5" class="wind-blow"/>
+    <ellipse cx="380" cy="248" rx="90"  ry="10" fill="#C4884A" opacity=".4" class="wind-blow"/>
+  </svg></div>
+  <p class="tap-hint">☁️ Tap the people to find out what they said about the cloud!</p>
+  <div class="text-card">
+    <div class="scene-title">☁️ "A Cloud! It's Bringing Us Rain!"</div>
+    <div class="scene-text">Then, a massive dark cloud appeared on the horizon, moving toward the valley of the Aad.<br><br>The people saw it and were filled with joy. They had been suffering from drought. Finally — rain!<br><br><em>"This is a cloud bringing us rain!"</em> they cried happily.<br><br>But the Quran tells us: <em>"No — it was what they had asked to hasten — a wind in which there is a painful punishment."</em> (Quran 46:24)<br><br>What they thought was their blessing — was the truth they had refused to hear, finally arriving.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: if you spend too long pretending something wrong is okay, you start to really believe it. The Aad had forgotten Allah for so long that even when the sign of punishment came, they thought it was a gift. That is why we should always stay close to Allah — so we never lose our way of seeing.</div>
+  </div>
+</div>
+
+<!-- PAGE 8: Seven Nights and Eight Days -->
+<div class="scene" id="s7">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="g7storm" cx="50%" cy="20%" r="80%"><stop offset="0%" stop-color="#1a0a00"/><stop offset="100%" stop-color="#0a0500"/></radialGradient>
+      <linearGradient id="g7wind" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5e3c" stop-opacity="0"/><stop offset="50%" stop-color="#c4884a" stop-opacity=".5"/><stop offset="100%" stop-color="#8b5e3c" stop-opacity="0"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g7storm)"/>
+    <!-- Swirling wind lines -->
+    <path d="M-20,80  Q120,60  260,80  Q380,100 500,80"  stroke="rgba(196,136,74,.35)" stroke-width="18" fill="none" class="wind-blow"/>
+    <path d="M-20,110 Q100,90  240,110 Q360,130 500,110" stroke="rgba(196,136,74,.3)"  stroke-width="14" fill="none" class="wind-blow" style="animation-delay:.3s"/>
+    <path d="M-20,140 Q140,120 280,140 Q400,160 500,140" stroke="rgba(139,94,60,.25)"  stroke-width="10" fill="none" class="wind-blow" style="animation-delay:.6s"/>
+    <path d="M-20,170 Q120,150 260,170 Q380,190 500,170" stroke="rgba(196,136,74,.2)"  stroke-width="8"  fill="none" class="wind-blow" style="animation-delay:.9s"/>
+    <!-- Towers crumbling / being destroyed -->
+    <g class="tower-shake">
+      <rect x="50"  y="100" width="55" height="130" rx="4" fill="#5D3A1A" opacity=".8"/>
+      <rect x="55"  y="90"  width="45" height="14"  rx="3" fill="#6B4020" opacity=".7"/>
+      <!-- Cracks -->
+      <path d="M70,120 L80,145 L75,168" stroke="#3d1f08" stroke-width="2" fill="none"/>
+      <path d="M85,100 L90,130 L82,160" stroke="#3d1f08" stroke-width="1.5" fill="none"/>
+    </g>
+    <g class="tower-shake" style="animation-delay:.15s">
+      <rect x="200" y="80"  width="70" height="150" rx="4" fill="#6B4020" opacity=".7"/>
+      <rect x="205" y="70"  width="60" height="14"  rx="3" fill="#8B5E3C" opacity=".6"/>
+      <path d="M220,100 L235,130 L225,165" stroke="#3d1f08" stroke-width="2.5" fill="none"/>
+    </g>
+    <g class="tower-shake" style="animation-delay:.3s">
+      <rect x="360" y="95"  width="65" height="135" rx="4" fill="#5D3A1A" opacity=".8"/>
+      <rect x="365" y="85"  width="55" height="14"  rx="3" fill="#6B4020" opacity=".7"/>
+      <path d="M375,115 L388,145 L380,170" stroke="#3d1f08" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Sand and debris flying -->
+    <ellipse cx="120" cy="200" rx="80" ry="20" fill="#C4884A" opacity=".4" class="wind-blow"/>
+    <ellipse cx="300" cy="190" rx="100" ry="18" fill="#C4884A" opacity=".35" class="wind-blow" style="animation-delay:.4s"/>
+    <ellipse cx="450" cy="210" rx="70"  ry="16" fill="#C4884A" opacity=".3" class="wind-blow" style="animation-delay:.8s"/>
+    <!-- Small debris -->
+    <rect x="140" y="155" width="12" height="8" rx="2" fill="#8B5E3C" opacity=".6" class="wind-blow"/>
+    <rect x="300" y="140" width="10" height="6" rx="2" fill="#6B4020" opacity=".5" class="wind-blow" style="animation-delay:.5s"/>
+    <rect x="380" y="165" width="8"  height="5" rx="2" fill="#8B5E3C" opacity=".5" class="wind-blow" style="animation-delay:.2s"/>
+    <!-- Ground crumbling -->
+    <rect x="0" y="240" width="480" height="40" fill="#3d1f08"/>
+    <!-- Verse text floating -->
+    <rect x="80" y="35" width="320" height="42" rx="14" fill="rgba(139,94,60,.25)"/>
+    <text x="240" y="54" text-anchor="middle" font-size="11" fill="#E8B87A" font-family="'Nunito',sans-serif" font-weight="700">"Destroying everything by command of its Lord"</text>
+    <text x="240" y="70" text-anchor="middle" font-size="10" fill="rgba(232,184,122,.7)" font-family="'Nunito',sans-serif">— Quran 46:25</text>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🌪️ Seven Nights and Eight Days</div>
+    <div class="scene-text">A fierce, screaming wind came upon the Aad.<br><br><em>"And as for Aad — they were destroyed by a screaming, violent wind, which Allah imposed upon them for <strong>seven nights and eight days</strong> in succession."</em> (Quran 69:6-7)<br><br>Everything the Aad had built — their towers, their palaces, their monuments of pride — <strong>was destroyed</strong>. The Quran says they were left like hollow trunks of fallen palm trees.<br><br>Their great strength could not save them. Their tall towers could not shelter them. <em>"Who is greater than us?"</em> — the wind answered.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: Allah was not being mean to the Aad. He gave them so much time — so many chances. He sent them Hud. He gave them warnings. But they kept choosing their towers over Allah. And here is the truth: <em>you cannot build anything higher than Allah.</em> The biggest tower in the world is still smaller than a single word of His.</div>
+  </div>
+</div>
+
+<!-- PAGE 9: Hud and the Believers — Safe -->
+<div class="scene" id="s8">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g8sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2840"/><stop offset="100%" stop-color="#0a1020"/></linearGradient>
+      <radialGradient id="g8calm" cx="65%" cy="60%" r="40%"><stop offset="0%" stop-color="#f9ca24" stop-opacity=".18"/><stop offset="100%" stop-color="#f9ca24" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g8sky)"/>
+    <!-- Stars -->
+    <circle cx="30"  cy="20" r="1.5" fill="white" opacity=".7"><animate attributeName="opacity" values=".3;1;.3" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="100" cy="12" r="1.5" fill="#FFF9C4"><animate attributeName="opacity" values=".2;.9;.2" dur="2.5s" repeatCount="indefinite" begin=".5s"/></circle>
+    <circle cx="180" cy="22" r="1.5" fill="white"><animate attributeName="opacity" values=".3;1;.3" dur="3.5s" repeatCount="indefinite" begin=".8s"/></circle>
+    <!-- STORM RAGING ON LEFT — dark churning wind -->
+    <ellipse cx="60" cy="80" rx="120" ry="60" fill="#0a0500" opacity=".9"/>
+    <ellipse cx="100" cy="105" rx="100" ry="48" fill="#111108" opacity=".8"/>
+    <!-- Wind streaks from left -->
+    <path d="M0,100 Q80,88 140,105"  stroke="rgba(139,94,60,.5)" stroke-width="10" fill="none" class="wind-blow"/>
+    <path d="M0,128 Q90,115 148,132"  stroke="rgba(139,94,60,.4)" stroke-width="7"  fill="none" class="wind-blow" style="animation-delay:.3s"/>
+    <path d="M0,155 Q70,143 135,158"  stroke="rgba(139,94,60,.3)" stroke-width="5"  fill="none" class="wind-blow" style="animation-delay:.6s"/>
+    <!-- Falling tower on left from storm -->
+    <rect x="30" y="88" width="40" height="100" rx="4" fill="#5D3A1A" opacity=".7" class="tower-shake"/>
+    <path d="M38,95 L48,125 L41,150" stroke="#3d1f08" stroke-width="2" fill="none" opacity=".7"/>
+    <!-- GROUND -->
+    <rect x="0" y="228" width="480" height="52" fill="#3d1f08"/>
+    <path d="M0,222 Q100,212 200,222 Q300,232 480,222 L480,228 L0,228Z" fill="#6B4020"/>
+    <!-- ════ ENCLOSURE — RIGHT HALF — clean and clear ════ -->
+    <!-- Golden protective glow inside enclosure -->
+    <rect x="210" y="160" width="255" height="70" rx="8" fill="url(#g8calm)"/>
+    <!-- FOUR CORNER STAKES — tall wooden posts, clearly visible -->
+    <rect x="215" y="155" width="10" height="55" rx="3" fill="#8B5E3C"/>
+    <rect x="455" y="155" width="10" height="55" rx="3" fill="#8B5E3C"/>
+    <rect x="215" y="210" width="10" height="20" rx="3" fill="#8B5E3C"/>
+    <rect x="455" y="210" width="10" height="20" rx="3" fill="#8B5E3C"/>
+    <!-- TOP ROPE connecting stakes — thick visible line -->
+    <line x1="220" y1="162" x2="460" y2="162" stroke="#A0704A" stroke-width="5" stroke-linecap="round"/>
+    <!-- BOTTOM ROPE -->
+    <line x1="220" y1="200" x2="460" y2="200" stroke="#A0704A" stroke-width="4" stroke-linecap="round"/>
+    <!-- Two middle stakes -->
+    <rect x="300" y="155" width="9" height="55" rx="3" fill="#8B5E3C"/>
+    <rect x="380" y="155" width="9" height="55" rx="3" fill="#8B5E3C"/>
+    <!-- Rope to middle stakes -->
+    <line x1="220" y1="162" x2="304" y2="162" stroke="#A0704A" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="304" y1="162" x2="384" y2="162" stroke="#A0704A" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="384" y1="162" x2="460" y2="162" stroke="#A0704A" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Label -->
+    <rect x="270" y="135" width="145" height="22" rx="10" fill="rgba(249,202,36,.15)"/>
+    <text x="342" y="151" text-anchor="middle" font-size="11" fill="#f9ca24" font-family="'Baloo 2',cursive" font-weight="700">🪵 The Enclosure</text>
+    <!-- WIND BENDING AROUND ENCLOSURE — key visual -->
+    <path d="M205,170 Q198,185 205,200" stroke="rgba(196,136,74,.7)" stroke-width="12" stroke-linecap="round" fill="none" class="wind-blow"/>
+    <!-- Arrow showing wind diverts around -->
+    <path d="M195,162 Q182,182 195,202" stroke="rgba(196,136,74,.5)" stroke-width="8" stroke-linecap="round" fill="none" class="wind-blow" style="animation-delay:.2s"/>
+    <!-- HUD inside enclosure — arms raised in prayer -->
+    <circle cx="310" cy="193" r="13" fill="#E8956A"/>
+    <ellipse cx="310" cy="181" rx="13" ry="8" fill="#5D3A1A"/>
+    <rect x="298" y="205" width="24" height="22" rx="6" fill="#2E86AB"/>
+    <ellipse cx="287" cy="210" rx="14" ry="5" fill="#E8956A" transform="rotate(-30,287,210)"/>
+    <ellipse cx="333" cy="210" rx="14" ry="5" fill="#E8956A" transform="rotate(30,333,210)"/>
+    <!-- Golden glow around Hud -->
+    <circle cx="310" cy="198" r="30" fill="none" stroke="rgba(249,202,36,.2)" stroke-width="2" class="glow-pulse"/>
+    <!-- BELIEVER 1 beside Hud -->
+    <circle cx="360" cy="196" r="11" fill="#D4A070"/>
+    <ellipse cx="360" cy="185" rx="11" ry="7" fill="#5D3A1A"/>
+    <rect x="350" y="206" width="20" height="22" rx="5" fill="#27AE60"/>
+    <!-- BELIEVER 2 -->
+    <circle cx="408" cy="195" r="11" fill="#C89060"/>
+    <ellipse cx="408" cy="184" rx="11" ry="7" fill="#5D3A1A"/>
+    <rect x="398" y="205" width="20" height="22" rx="5" fill="#8E44AD"/>
+    <!-- Peaceful stars above enclosure -->
+    <circle cx="310" cy="140" r="2"   fill="#f9ca24" opacity=".6" class="glow-pulse"/>
+    <circle cx="350" cy="130" r="1.5" fill="#f9ca24" opacity=".5" class="glow-pulse" style="animation-delay:.4s"/>
+    <circle cx="400" cy="138" r="2"   fill="#f9ca24" opacity=".55" class="glow-pulse" style="animation-delay:.8s"/>
+  </svg></div>
+  <div class="text-card">
+    <div class="scene-title">🌿 Hud and the Believers — Safe</div>
+    <div class="scene-text">When the punishment came, Hud and the believers who followed him <strong>took refuge in an open enclosure</strong> — a simple open area, nothing but stakes and rope.<br><br>And a miracle happened.<br><br>The fierce wind that was collapsing stone towers and palaces <em>entered the enclosure gently</em>. It could not touch them.<br><br>Hud and his companions sat in peace — while the storm raged all around them.<br><br>Then, after the destruction, they migrated to <strong>Hadramaut</strong> — a peaceful town in southern Arabia — where they lived worshipping Allah in peace.</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: Hud and his friends were not protected by thick walls or tall towers. They were protected by Allah. And that is the safest place in the whole world — not inside a palace, but inside Allah's care.</div>
+  </div>
+</div>
+
+<!-- PAGE 10: What Remains -->
+<div class="scene" id="s9">
+  <div class="visual"><svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g9sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87CEEB"/><stop offset="100%" stop-color="#C4884A"/></linearGradient>
+    </defs>
+    <rect width="480" height="280" fill="url(#g9sky)"/>
+    <circle cx="60" cy="50" r="32" fill="#FFD54F" opacity=".85"/>
+    <!-- Desert sand dunes everywhere -->
+    <ellipse cx="240" cy="230" rx="300" ry="70" fill="#C4884A"/>
+    <ellipse cx="120" cy="245" rx="150" ry="45" fill="#8B5E3C"/>
+    <ellipse cx="380" cy="240" rx="130" ry="40" fill="#A0704A"/>
+    <!-- Half-buried ruins — only dwellings remain -->
+    <g class="tappable" onclick="popup(4)">
+      <!-- Broken tower half buried -->
+      <rect x="60"  y="170" width="50" height="70"  rx="4" fill="#5D3A1A" opacity=".7"/>
+      <rect x="55"  y="165" width="60" height="12"  rx="3" fill="#6B4020" opacity=".6"/>
+      <!-- Sand buried lower half -->
+      <ellipse cx="85"  cy="222" rx="55" ry="22" fill="#C4884A"/>
+      <!-- Crack in tower -->
+      <path d="M75,172 L85,200 L78,215" stroke="#3d1f08" stroke-width="2" fill="none" opacity=".7"/>
+      <!-- Second ruin -->
+      <rect x="200" y="160" width="65" height="80"  rx="4" fill="#6B4020" opacity=".6"/>
+      <rect x="195" y="153" width="75" height="13"  rx="3" fill="#8B5E3C" opacity=".5"/>
+      <ellipse cx="232" cy="228" rx="75" ry="25" fill="#A0704A"/>
+      <path d="M215,165 L228,198 L218,220" stroke="#3d1f08" stroke-width="2.5" fill="none" opacity=".7"/>
+      <!-- Third ruin -->
+      <rect x="360" y="175" width="55" height="65"  rx="4" fill="#5D3A1A" opacity=".7"/>
+      <rect x="355" y="168" width="65" height="12"  rx="3" fill="#6B4020" opacity=".6"/>
+      <ellipse cx="387" cy="228" rx="65" ry="20" fill="#8B5E3C"/>
+    </g>
+    <!-- Wind sweeping sand across the ruins -->
+    <path d="M0,195 Q120,182 240,195 Q360,208 480,195" stroke="rgba(196,136,74,.35)" stroke-width="12" fill="none" class="wind-blow"/>
+    <!-- Verse overlay -->
+    <rect x="70" y="60" width="340" height="48" rx="14" fill="rgba(0,0,0,.35)"/>
+    <text x="240" y="80" text-anchor="middle" font-size="11" fill="#E8B87A" font-family="'Nunito',sans-serif" font-weight="700">"Nothing was seen of them</text>
+    <text x="240" y="98" text-anchor="middle" font-size="11" fill="#E8B87A" font-family="'Nunito',sans-serif" font-weight="700">except their dwellings." — Quran 46:25</text>
+    <!-- Lone traveller contemplating ruins -->
+    <circle cx="450" cy="205" r="9" fill="#E8956A" opacity=".8"/>
+    <rect x="443" y="213" width="14" height="20" rx="4" fill="#2E86AB" opacity=".8"/>
+  </svg></div>
+  <p class="tap-hint">🏚️ Tap the ruins to discover what the Quran says!</p>
+  <div class="text-card">
+    <div class="scene-title">🏚️ Nothing Remained Except Their Dwellings</div>
+    <div class="scene-text">When the seven nights and eight days were over — the Aad were gone.<br><br>The Quran says: <em>"Destroying everything by command of its Lord — and they became so that nothing was seen of them except their dwellings."</em> (Quran 46:25)<br><br>Their towers — buried under sand. Their palaces — rubble. Their strength — gone like dust in the wind.<br><br>Today, in the region of southern Arabia, there are ancient ruins that local people still call <strong>Dar Aad</strong> — the abode of Aad. A reminder that remains in the earth.<br><br>Allah says: <em>"Indeed in that is a sign — but most of them are not believers."</em> (Quran 26:139)</div>
+    <div class="ibn-arabi">Ibn ʿArabī says: the ruins of the Aad are like a message in the sand that says: <em>what did you build your life on?</em> Things that last — like love, honesty, and trust in Allah — or things that fall — like showing off and being proud?</div>
+  </div>
+</div>
+
+<!-- PAGE 11: Your Tower -->
+<div class="scene" id="s10" style="justify-content:flex-start;padding-top:80px">
+  <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.8rem;text-align:center;width:100%">🏗️</div>
+  <div style="font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:var(--gold);margin-bottom:.8rem;text-align:center;background:rgba(13,6,0,.85);padding:.4rem 1.4rem;border-radius:12px;max-width:520px;width:100%">What Are You Building?</div>
+  <div class="sand-card">
+    <p>The Aad built towers of stone. <strong>They built to show off — not to thank Allah.</strong></p>
+    <p>Every time you do something to show off, to be better than others, to make people say "wow" — you are building a tower of the Aad.</p>
+    <p style="font-weight:600;color:#6b3a10"><em>That tower will not protect you when the wind comes.</em></p>
+  </div>
+  <div class="sand-card">
+    <p>Hud built something different. <strong>He built trust.</strong></p>
+    <p>Every time you do something for Allah — even when no one is watching, even when people laugh, even when it is hard — you are building something the wind cannot touch.</p>
+    <p style="font-weight:600;color:#6b3a10"><em>What are you building today?</em></p>
+  </div>
+  <div class="thought-box">
+    💭 Think of one thing you did this week.<br>
+    Did you do it to show off — or did you do it for Allah?<br><br>
+    <em>That is the question Hud's story asks you every day.</em>
+  </div>
+</div>
+
+<!-- PAGE 12: Reflection -->
+<div class="scene" id="s11" style="justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;padding:1rem">
+    <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.8rem">🌬️</div>
+    <div class="ending-title">Hud's Gift to Us</div>
+    <div style="font-size:1rem;line-height:1.75;color:var(--cream);text-align:center;margin-bottom:1.2rem">
+      Hud walked among his own people — his own family — and called them back to Allah.<br><br>
+      They laughed. The years passed. They grew prouder.<br><br>
+      And Hud kept walking. Day after day. Step by step.<br><br>
+      Because that is what trust looks like — not a feeling. A walk.
+    </div>
+    <div class="reflection-box">
+      <div class="reflection-q">💭 A question just for you...</div>
+      <p style="color:rgba(255,255,255,.85);font-size:.95rem;line-height:1.7">
+        Is there something right that you keep doing — even when people don't notice? Even when it is hard?<br><br>
+        <em>That is your walk with Allah.<br>
+        Keep going. Hud kept going too. 🏜️</em>
+      </p>
+    </div>
+    <div style="background:rgba(255,255,255,.08);border:1.5px solid rgba(249,202,36,.3);border-radius:14px;padding:1rem;max-width:480px;margin:.8rem auto 0">
+      <div style="font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;letter-spacing:.5px">AUDIO NARRATION</div>
+      <div style="font-size:.95rem;line-height:1.75;color:var(--cream);text-align:left">
+        Hud walked among his own people ... his own family ...<br>
+        and he called them back to Allah ... day after day ...<br>
+        They laughed ... the years passed ... they grew prouder ...<br>
+        And Hud ... kept walking ...<br>
+        Because that is what trust looks like ...<br>
+        Not a feeling ... a walk ...<br><br>
+        Is there something right that YOU keep doing ...<br>
+        even when people don't notice? ...<br>
+        Even when it is hard? ...<br><br>
+        That ... is your walk with Allah ...<br>
+        Keep going ... Hud kept going too ...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 13: What I Learned -->
+<div class="scene" id="s12" style="justify-content:center">
+  <div style="max-width:520px;width:100%;text-align:center;padding:1rem">
+    <div style="font-size:50px;animation:float 2s ease-in-out infinite;margin-bottom:.6rem">✨</div>
+    <div class="ending-title">What I Learned</div>
+    <div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:1.2rem">from the story of Prophet Hud — peace be upon him</div>
+    <div class="lesson-card"><span class="lesson-icon">💪</span><div><div class="lesson-title">Trust Allah — even when you stand alone</div><div class="lesson-body">Hud faced his whole people. He did not need them to believe. He needed Allah — and Allah was enough.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">🏗️</span><div><div class="lesson-title">Build for Allah — not to show off</div><div class="lesson-body">The Aad's towers fell. Everything built for pride falls eventually. Only what is built for Allah remains.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">👣</span><div><div class="lesson-title">Keep walking — even when it is slow</div><div class="lesson-body">The wisdom of Hud is the wisdom of the feet. You learn Allah by walking — day after day, step by step.</div></div></div>
+    <div class="lesson-card"><span class="lesson-icon">🌬️</span><div><div class="lesson-title">Strength without Allah is nothing</div><div class="lesson-body">The Aad were the strongest people on earth. And a wind took them in eight days. Only Allah's protection lasts.</div></div></div>
+    <div style="background:rgba(255,255,255,.08);border:1.5px solid rgba(249,202,36,.3);border-radius:14px;padding:1rem;max-width:480px;margin:1rem auto">
+      <div style="font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;letter-spacing:.5px">AUDIO NARRATION</div>
+      <div style="font-size:.95rem;line-height:1.75;color:var(--cream);text-align:left">
+        From the story of Prophet Hud ... peace be upon him ...<br>
+        we learned four beautiful things ...<br><br>
+        First ... Trust Allah — even when you stand alone ...<br>
+        Hud faced his whole people ... and Allah was enough ...<br><br>
+        Second ... Build for Allah — not to show off ...<br>
+        The towers of the Aad fell ... what is built for Allah remains ...<br><br>
+        Third ... Keep walking — even when it is slow ...<br>
+        The wisdom of Hud is the wisdom of the feet ...<br>
+        You learn Allah ... by walking ... day after day ...<br><br>
+        Fourth ... Strength without Allah is nothing ...<br>
+        The Aad were the strongest people on earth ...<br>
+        And a wind took them in eight days ...<br>
+        Only Allah's protection ... truly lasts ...<br><br>
+        May Allah make you a walker ... like Hud ...<br>
+        steady ... faithful ... and never giving up ... 🏜️
+      </div>
+    </div>
+    <button class="restart-btn" onclick="goTo(0)">🔄 Read the story again!</button>
+  </div>
+</div>
+
+</div><!-- /story -->
+
+<div class="bottom-nav" id="bottomNav">
+  <button class="nav-btn" id="prevBtn" onclick="goTo(currentPage-1)" disabled>← Back</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="play-btn" id="playBtn" onclick="togglePlay()" title="Play / Pause">▶</button>
+    <div class="time-display" id="timeDisplay">0:00</div>
+  </div>
+  <div class="nav-dots" id="navDots"></div>
+  <button class="nav-btn nav-next" id="nextBtn" onclick="goTo(currentPage+1)">Next →</button>
+</div>
+
+<script>
+const TOTAL = 13;
+let currentPage = 0;
+let isPlaying = false;
+let choiceMade = false;
+
+// One audio file per page — named audio_hud_1.mp3 to audio_hud_13.mp3
+const AUDIO_FILES = [
+  "audio_hud_1.mp3",   // page 1  — Mighty people of Aad
+  "audio_hud_2.mp3",   // page 2  — Pride and forgetting
+  "audio_hud_3.mp3",   // page 3  — Hud calls his people
+  "audio_hud_4.mp3",   // page 4  — They mock him / years pass
+  "audio_hud_5.mp3",   // page 5  — Hud's fearless answer
+  "audio_hud_6.mp3",   // page 6  — Choice question
+  "audio_hud_7.mp3",   // page 7  — The cloud
+  "audio_hud_8.mp3",   // page 8  — Seven nights eight days
+  "audio_hud_9.mp3",   // page 9  — Hud and believers safe
+  "audio_hud_10.mp3",  // page 10 — What remains
+  "audio_hud_11.mp3",  // page 11 — Your tower
+  "audio_hud_12.mp3",  // page 12 — Reflection
+  "audio_hud_13.mp3",  // page 13 — What I learned
+];
+
+const POPUP_DATA = [
+  {emoji:"🏛️", title:"How big were the Aad?", text:"Allah made them very, very tall and strong — stronger than anyone else on earth at that time! The Quran says: 'the likes of whom had never been created in the land.' They were like giants! And they built huge stone towers."},
+  {emoji:"🪨", title:"What was their sin?", text:"The Aad knew Allah made them — but they bowed down to stone statues instead! And they used their strength to be mean to weaker people. Allah does not like that."},
+  {emoji:"😤", title:"What did they say to Hud?", text:"They called Hud a fool and a liar! But Hud answered calmly: 'There is no foolishness in me — I am a messenger from Allah.' He never got angry. He just kept telling the truth."},
+  {emoji:"☁️", title:"What did they say?", text:"They saw the dark cloud coming and they were HAPPY — they thought it was finally going to rain! They did not know it was the punishment. They had refused the truth for so long, they could not see it anymore."},
+  {emoji:"🏚️", title:"What remains of the Aad?", text:"The Quran says nothing was left of them except their empty houses. Their towers fell. Their strength was gone. Today there are old ruins in Arabia that people still call Dar Aad — the place of Aad. A reminder for all of us."}
+];
+
+const CHOICE_DATA = [
+  {emoji:"😔", text:"Yes — it hurts deeply when the people we love call us wrong. Hud felt that too. He was their own brother, their own family. But he never let that pain stop him. He kept calling because the truth is worth carrying, even when it is heavy."},
+  {emoji:"💪", text:"That is the spirit of Hud! He stood completely alone against his whole tribe and said: 'I call Allah to witness — do your worst.' He was not fearless because he was strong. He was fearless because he knew Allah held everything."},
+  {emoji:"🤲", text:"Beautiful — and that is exactly what Hud did. When they rejected him completely, he turned to Allah: 'My Lord! Help me, because they have denied me.' (Quran 23:39). Prayer is not giving up. Prayer is walking hand in hand with Allah."}
+];
+
+const audio = document.getElementById("storyAudio");
+
+function loadPageAudio(n) {
+  audio.src = AUDIO_FILES[n];
+  audio.load();
+}
+
+audio.addEventListener("error", function() {
+  var btn = document.getElementById("playBtn");
+  if (btn) { btn.textContent = "✕"; btn.style.background = "rgba(255,60,60,.4)"; }
+});
+audio.addEventListener("play",  function() { isPlaying = true;  updatePlayBtn(); });
+audio.addEventListener("pause", function() { isPlaying = false; updatePlayBtn(); });
+
+// Auto-advance to next page when audio ends
+audio.addEventListener("ended", function() {
+  isPlaying = false;
+  updatePlayBtn();
+  var td = document.getElementById("timeDisplay");
+  if (td) td.textContent = "0:00";
+  if (currentPage < TOTAL - 1) { goTo(currentPage + 1); }
+});
+
+audio.addEventListener("timeupdate", function() {
+  var t = audio.currentTime;
+  var m = Math.floor(t / 60);
+  var s = Math.floor(t % 60).toString().padStart(2, "0");
+  var td = document.getElementById("timeDisplay");
+  if (td) td.textContent = m + ":" + s;
+});
+
+function updatePlayBtn() {
+  var btn = document.getElementById("playBtn");
+  if (!btn) return;
+  btn.textContent = isPlaying ? "⏸" : "▶";
+  btn.classList.toggle("playing", isPlaying);
+}
+function togglePlay() {
+  if (isPlaying) { audio.pause(); } else { audio.play(); }
+}
+
+function makeStars() {
+  var sf = document.getElementById("stars");
+  for (var i = 0; i < 80; i++) {
+    var d = document.createElement("div");
+    var sz = Math.random() * 2.5 + 0.5;
+    d.className = "star";
+    d.style.width = sz + "px";
+    d.style.height = sz + "px";
+    d.style.left = (Math.random() * 100) + "%";
+    d.style.top = (Math.random() * 60) + "%";
+    d.style.animationDelay = (Math.random() * 3) + "s";
+    d.style.animationDuration = (2 + Math.random() * 3) + "s";
+    sf.appendChild(d);
+  }
+}
+function buildDots() {
+  var c = document.getElementById("navDots");
+  c.innerHTML = "";
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement("div");
+    d.className = "nav-dot"; d.id = "dot" + i;
+    c.appendChild(d);
+  }
+}
+function startStory() {
+  document.getElementById("cover").style.display = "none";
+  document.getElementById("story").style.display = "block";
+  document.getElementById("bottomNav").classList.add("visible");
+  buildDots();
+  goTo(0);
+}
+function showScene(n) {
+  document.querySelectorAll(".scene").forEach(function(s) { s.classList.remove("active"); });
+  var el = document.getElementById("s" + n);
+  if (!el) { console.warn("Scene s" + n + " not found"); return; }
+  el.classList.add("active");
+  document.querySelectorAll(".nav-dot").forEach(function(d, i) { d.classList.toggle("active", i === n); });
+  document.getElementById("prevBtn").disabled = (n === 0);
+  var nb = document.getElementById("nextBtn");
+  nb.disabled = (n === TOTAL - 1);
+  nb.textContent = n === TOTAL - 1 ? "Done ✓" : "Next →";
+  var pct = ((n + 1) / TOTAL) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("pageCounter").textContent = (n + 1) + " / " + TOTAL;
+  window.scrollTo({top: 0, behavior: "instant"});
+}
+function resetChoicePage() {
+  choiceMade = false;
+  document.querySelectorAll(".choice-btn").forEach(function(b) { b.disabled = false; });
+  var resp = document.getElementById("choiceResp");
+  if (resp) resp.classList.remove("open");
+}
+function goTo(n) {
+  if (n < 0 || n >= TOTAL) return;
+  if (currentPage === 5 && n !== 5) resetChoicePage();
+  if (n === 5) resetChoicePage();
+  currentPage = n;
+  showScene(n);
+  audio.pause();
+  audio.src = "";
+  loadPageAudio(n);
+  audio.play().catch(function(){});
+}
+function chooseAnswer(i) {
+  // Stop audio immediately when child picks an answer
+  audio.pause();
+  var d = CHOICE_DATA[i];
+  document.getElementById("choiceEmoji").textContent = d.emoji;
+  document.getElementById("choiceText").textContent  = d.text;
+  document.getElementById("choiceResp").classList.add("open");
+  document.querySelectorAll(".choice-btn").forEach(function(b) { b.disabled = true; });
+  choiceMade = true;
+  // Resume page 6 audio from 0:25 (the continuation after the question)
+  audio.currentTime = 26;
+  audio.play().catch(function(){});
+}
+function popup(i) {
+  var d = POPUP_DATA[i];
+  document.getElementById("popup-emoji").textContent = d.emoji;
+  document.getElementById("popup-title").textContent = d.title;
+  document.getElementById("popup-text").textContent  = d.text;
+  document.getElementById("popup").classList.add("open");
+}
+function closePopup() { document.getElementById("popup").classList.remove("open"); }
+makeStars();
+</script>
+</body>
+</html>
